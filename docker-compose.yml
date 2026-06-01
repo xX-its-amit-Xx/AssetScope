@@ -59,7 +59,9 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_BASE: http://localhost:8000
+        # Default: same-origin "/api", reverse-proxied to the api service by
+        # nginx (see frontend/nginx.conf). No CORS, API not exposed publicly.
+        VITE_API_BASE: ${VITE_API_BASE:-/api}
     ports:
       - "8080:80"
     depends_on:
