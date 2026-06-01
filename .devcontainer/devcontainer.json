@@ -13,5 +13,6 @@
     "8080": { "label": "AssetScope UI" },
     "11434": { "label": "Ollama (local LLM)" }
   },
-  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" }
+  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
+  "postCreateCommand": "bash .devcontainer/setup.sh"
 }
