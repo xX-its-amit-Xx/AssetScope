@@ -1,0 +1,26 @@
+# AssetScope API image.
+FROM python:3.11-slim
+
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# curl is used as a transport fallback for providers that block Python's TLS
+# fingerprint (e.g. ClinicalTrials.gov behind Akamai). psycopg[binary] bundles libpq.
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml README.md ./
+COPY assetscope ./assetscope
+
+ARG INSTALL_EMBEDDINGS=false
+RUN pip install --upgrade pip && \
+    if [ "$INSTALL_EMBEDDINGS" = "true" ]; then \
+        pip install ".[embeddings]"; \
+    else \
+        pip install . ; \
+    fi
+
+EXPOSE 8000
+CMD ["uvicorn", "assetscope.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

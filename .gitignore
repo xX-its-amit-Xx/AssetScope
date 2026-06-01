@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log
+
+# Environment
+.env
+.env.local
+
+# Models / caches
+.cache/
+models_cache/
+*.pt
+*.bin
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Eval outputs (keep the committed reference report, ignore ad-hoc runs)
+results/*
+!results/.gitkeep
+!results/eval_report.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

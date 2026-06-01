@@ -1,0 +1,108 @@
+{
+  "id": "btk_inhibitors",
+  "query": "Competitive landscape for BTK inhibitors in B-cell malignancies",
+  "notes": "Hand-curated from ClinicalTrials.gov v2, ChEMBL v34, PubMed and Open Targets (verified mid-2026).",
+  "assets": [
+    {
+      "name": "ibrutinib",
+      "aliases": ["imbruvica"],
+      "facts": {
+        "company": ["AbbVie", "Johnson", "Janssen"],
+        "target": ["BTK"],
+        "mechanism": ["covalent", "irreversible", "Cys481"],
+        "phase": ["Approved"],
+        "latest_readout": ["RESONATE"]
+      },
+      "sources": ["CHEMBL1873475", "24881631", "NCT01578707"]
+    },
+    {
+      "name": "acalabrutinib",
+      "aliases": ["calquence", "ACP-196"],
+      "facts": {
+        "company": ["AstraZeneca", "Acerta"],
+        "target": ["BTK"],
+        "mechanism": ["covalent", "irreversible", "selective"],
+        "phase": ["Approved"],
+        "latest_readout": ["ELEVATE"]
+      },
+      "sources": ["CHEMBL3707348", "32305093", "NCT02475681"]
+    },
+    {
+      "name": "zanubrutinib",
+      "aliases": ["brukinsa", "BGB-3111"],
+      "facts": {
+        "company": ["BeiGene", "BeOne"],
+        "target": ["BTK"],
+        "mechanism": ["covalent", "irreversible", "selective"],
+        "phase": ["Approved"],
+        "latest_readout": ["ALPINE", "SEQUOIA"]
+      },
+      "sources": ["CHEMBL3936761", "36511784", "NCT03734016"]
+    },
+    {
+      "name": "pirtobrutinib",
+      "aliases": ["jaypirca", "LOXO-305"],
+      "facts": {
+        "company": ["Eli Lilly", "Lilly", "Loxo"],
+        "target": ["BTK"],
+        "mechanism": ["non-covalent", "reversible", "C481S"],
+        "phase": ["Approved"],
+        "latest_readout": ["BRUIN"]
+      },
+      "sources": ["CHEMBL4650485", "33676628", "NCT03740529"]
+    },
+    {
+      "name": "nemtabrutinib",
+      "aliases": ["MK-1026", "ARQ-531"],
+      "facts": {
+        "company": ["Merck"],
+        "target": ["BTK"],
+        "mechanism": ["non-covalent", "reversible"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["BELLWAVE", "C481S"]
+      },
+      "sources": ["CHEMBL4756476", "30093506", "NCT03162536"]
+    },
+    {
+      "name": "tirabrutinib",
+      "aliases": ["velexbru", "ONO-4059", "GS-4059"],
+      "facts": {
+        "company": ["Ono", "Gilead"],
+        "target": ["BTK"],
+        "mechanism": ["covalent", "irreversible"],
+        "phase": ["Approved", "Phase 3"],
+        "latest_readout": ["CNS lymphoma", "PCNSL"]
+      },
+      "sources": ["CHEMBL4071161", "32583848"]
+    },
+    {
+      "name": "NX-5948",
+      "aliases": ["bexobrutideg"],
+      "facts": {
+        "company": ["Nurix"],
+        "target": ["BTK"],
+        "mechanism": ["degrader", "PROTAC", "CNS"],
+        "phase": ["Phase 1"],
+        "latest_readout": ["double-refractory", "CLL"]
+      },
+      "sources": ["CHEMBL5558927", "NCT05131022"]
+    },
+    {
+      "name": "BGB-16673",
+      "aliases": ["bgb16673"],
+      "facts": {
+        "company": ["BeiGene", "BeOne"],
+        "target": ["BTK"],
+        "mechanism": ["degrader", "CDAC", "CRBN"],
+        "phase": ["Phase 1", "Phase 3"],
+        "latest_readout": ["CaDAnCe", "pirtobrutinib"]
+      },
+      "sources": ["NCT05006716", "NCT06973187"]
+    }
+  ],
+  "contradictions": [
+    { "terms": ["pirtobrutinib", "covalent", "irreversible"], "note": "Pirtobrutinib is a NON-COVALENT reversible inhibitor." },
+    { "terms": ["ibrutinib", "degrader"], "note": "Ibrutinib is a covalent inhibitor, not a degrader." },
+    { "terms": ["evobrutinib", "approved"], "note": "Evobrutinib's phase 3 MS trials failed; it is not approved." }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "_comment": "Replay fixture for the BTK inhibitor query. NX-5948 is intentionally omitted (asset recall < 100%); the final claim cites a non-retrieved source and is dropped by the guard.",
+  "tool_calls": 12,
+  "valid_source_ids": [
+    "CHEMBL5251", "CHEMBL1873475", "CHEMBL3707348", "CHEMBL3936761",
+    "CHEMBL4650485", "CHEMBL4071161", "CHEMBL4650321", "CHEMBL4756476",
+    "CHEMBL4483575", "CHEMBL3702854", "CHEMBL4065122", "CHEMBL4072833",
+    "CHEMBL5435454", "CHEMBL5558927", "CHEMBL4523704",
+    "NCT01578707", "NCT01744691", "NCT02475681", "NCT02477696", "NCT03734016",
+    "NCT03336333", "NCT03740529", "NCT04662255", "NCT05254743", "NCT03162536",
+    "NCT04947319", "NCT07104032", "NCT05030311", "NCT05032157", "NCT04562766",
+    "NCT04586023", "NCT04586010", "NCT04544449", "NCT04338022", "NCT04338061",
+    "NCT04830137", "NCT05131022", "NCT07221500", "NCT05006716", "NCT06973187",
+    "24881631", "32305093", "36511784", "35810754", "33676628", "32583848",
+    "30093506", "40043237", "39844469", "37869360",
+    "OT:ENSG00000010671"
+  ],
+  "assets": [
+    {
+      "asset_name": "Ibrutinib (Imbruvica)",
+      "company": "AbbVie / Johnson & Johnson",
+      "target": "BTK",
+      "mechanism": "Covalent irreversible inhibitor (binds Cys481)",
+      "indication": "CLL/SLL, MCL, WM, marginal zone lymphoma, chronic GVHD",
+      "phase": "Approved",
+      "latest_readout": "RESONATE (NCT01578707): PFS and OS benefit vs ofatumumab in R/R CLL (NEJM 2014); first-in-class, approved 2013.",
+      "source_ids": ["CHEMBL1873475", "24881631", "NCT01578707"]
+    },
+    {
+      "asset_name": "Acalabrutinib (Calquence)",
+      "company": "AstraZeneca (Acerta Pharma)",
+      "target": "BTK",
+      "mechanism": "Covalent irreversible, second-generation and more selective (binds Cys481)",
+      "indication": "CLL/SLL, MCL",
+      "phase": "Approved",
+      "latest_readout": "ELEVATE-TN (NCT02475681) superior PFS in treatment-naive CLL (Lancet 2020); ELEVATE-RR non-inferior to ibrutinib with less atrial fibrillation.",
+      "source_ids": ["CHEMBL3707348", "32305093", "NCT02475681"]
+    },
+    {
+      "asset_name": "Zanubrutinib (Brukinsa)",
+      "company": "BeiGene",
+      "target": "BTK",
+      "mechanism": "Covalent irreversible, second-generation and more selective (binds Cys481)",
+      "indication": "CLL/SLL, MCL, WM, marginal zone lymphoma",
+      "phase": "Approved",
+      "latest_readout": "ALPINE (NCT03734016): SUPERIOR PFS vs ibrutinib in R/R CLL — first BTKi to beat ibrutinib head-to-head (NEJM 2023); SEQUOIA superiority vs BR.",
+      "source_ids": ["CHEMBL3936761", "36511784", "NCT03734016"]
+    },
+    {
+      "asset_name": "Pirtobrutinib (Jaypirca)",
+      "company": "Eli Lilly (Loxo Oncology)",
+      "target": "BTK",
+      "mechanism": "Non-covalent reversible inhibitor (Cys481-independent; active against C481S-mutant disease)",
+      "indication": "R/R MCL, R/R CLL/SLL (post covalent BTKi)",
+      "phase": "Approved",
+      "latest_readout": "BRUIN (NCT03740529): durable responses in heavily pretreated and C481S-mutant disease (Lancet 2021); accelerated approvals 2023.",
+      "source_ids": ["CHEMBL4650485", "33676628", "NCT03740529"]
+    },
+    {
+      "asset_name": "Nemtabrutinib (MK-1026)",
+      "company": "Merck & Co",
+      "target": "BTK",
+      "mechanism": "Non-covalent reversible inhibitor (active against C481S and gatekeeper mutations)",
+      "indication": "R/R CLL/SLL and other B-cell malignancies",
+      "phase": "Phase 3",
+      "latest_readout": "BELLWAVE-001 (NCT03162536) responses across BTKi-resistant disease; phase 3 BELLWAVE program ongoing (C481S activity, Cancer Discovery 2018).",
+      "source_ids": ["CHEMBL4756476", "30093506", "NCT03162536"]
+    },
+    {
+      "asset_name": "Tirabrutinib (Velexbru)",
+      "company": "Ono Pharmaceutical / Gilead Sciences",
+      "target": "BTK",
+      "mechanism": "Covalent irreversible, second-generation (binds Cys481)",
+      "indication": "Primary CNS lymphoma (PCNSL); WM (Japan)",
+      "phase": "Approved (Japan); Phase 3 (global PCNSL)",
+      "latest_readout": "Phase 1/2 in R/R PCNSL (Neuro-Oncology 2021); Japan approval 2020.",
+      "source_ids": ["CHEMBL4071161", "32583848"]
+    },
+    {
+      "asset_name": "BGB-16673",
+      "company": "BeiGene",
+      "target": "BTK",
+      "mechanism": "BTK degrader (CDAC chimeric degradation-activating compound; CRBN-recruiting)",
+      "indication": "R/R CLL/SLL, MCL, WM",
+      "phase": "Phase 1/2 (lead); Phase 3 initiated",
+      "latest_readout": "CaDAnCe-101 (NCT05006716) responses in covalent/non-covalent-BTKi-resistant disease; phase 3 vs pirtobrutinib (NCT06973187).",
+      "source_ids": ["NCT05006716", "NCT06973187"]
+    }
+  ],
+  "narrative_claims": [
+    { "text": "Three covalent BTK inhibitors are approved for B-cell malignancies: ibrutinib (first-in-class), acalabrutinib and zanubrutinib.", "source_ids": ["CHEMBL1873475", "CHEMBL3707348", "CHEMBL3936761"] },
+    { "text": "In the head-to-head ALPINE trial, zanubrutinib demonstrated superior progression-free survival versus ibrutinib in relapsed/refractory CLL — the first BTKi to beat ibrutinib.", "source_ids": ["36511784", "NCT03734016"] },
+    { "text": "Acalabrutinib showed non-inferior PFS to ibrutinib with significantly less atrial fibrillation in ELEVATE-RR, reflecting its greater BTK selectivity.", "source_ids": ["32305093", "CHEMBL3707348"] },
+    { "text": "Pirtobrutinib is a non-covalent, Cys481-independent BTK inhibitor that retains activity against C481S-mutant, covalent-BTKi-resistant disease and is approved in R/R MCL and CLL/SLL.", "source_ids": ["CHEMBL4650485", "33676628", "NCT03740529"] },
+    { "text": "BTK degraders such as BeiGene's BGB-16673 aim to overcome both Cys481 and kinase-dead resistance, and are now in phase 3 versus pirtobrutinib.", "source_ids": ["NCT05006716", "NCT06973187"] },
+    { "text": "Nemtabrutinib (Merck, MK-1026) is a reversible BTK inhibitor active against C481S and gatekeeper mutations, in phase 3 development.", "source_ids": ["CHEMBL4756476", "30093506"] },
+    { "text": "Tirabrutinib is approved in Japan and is differentiated by activity in primary CNS lymphoma.", "source_ids": ["CHEMBL4071161", "32583848"] },
+    { "text": "BTK (ENSG00000010671) is the central validated target across CLL, mantle cell lymphoma and other B-cell malignancies in Open Targets.", "source_ids": ["OT:ENSG00000010671"] },
+    { "text": "Pirtobrutinib is a covalent irreversible inhibitor that binds Cys481.", "source_ids": ["NCT11111111"] }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "_comment": "Replay fixture: a representative AssetScope agent submission for the GLP-1 obesity query, assembled from the verified ClinicalTrials.gov / ChEMBL / PubMed data. The last narrative claim cites a non-retrieved source id and is dropped by the reliability guard. valid_source_ids is the agent's citation ledger (everything it actually retrieved).",
+  "tool_calls": 10,
+  "valid_source_ids": [
+    "NCT03548935", "NCT04184622", "NCT04881760", "NCT05929066", "NCT06662383",
+    "NCT05567796", "NCT05394519", "NCT06066528", "NCT04617275", "NCT05607680",
+    "NCT06972459", "NCT06948435",
+    "33567185", "35658024", "38078870", "40960239", "40481478", "37366315",
+    "40544433", "41328546", "39821928", "41216778", "40539310", "40421736",
+    "CHEMBL2108724", "CHEMBL4297839", "CHEMBL4446782", "CHEMBL5095485",
+    "CHEMBL4802169", "CHEMBL5314776", "CHEMBL4518483", "CHEMBL5095358",
+    "OT:ENSG00000112164"
+  ],
+  "assets": [
+    {
+      "asset_name": "Semaglutide 2.4 mg (Wegovy)",
+      "company": "Novo Nordisk",
+      "target": "GLP-1R",
+      "mechanism": "GLP-1 receptor agonist (acylated peptide, once-weekly subcutaneous)",
+      "indication": "Obesity / overweight with comorbidities",
+      "phase": "Approved",
+      "latest_readout": "STEP 1 (NCT03548935): ~14.9% mean weight loss at 68 weeks vs 2.4% placebo (NEJM 2021).",
+      "source_ids": ["NCT03548935", "33567185", "CHEMBL2108724"]
+    },
+    {
+      "asset_name": "Tirzepatide (Zepbound / Mounjaro)",
+      "company": "Eli Lilly",
+      "target": "GLP-1R/GIPR",
+      "mechanism": "Dual GIP and GLP-1 receptor agonist (once-weekly subcutaneous peptide)",
+      "indication": "Obesity; type 2 diabetes; obstructive sleep apnea",
+      "phase": "Approved",
+      "latest_readout": "SURMOUNT-1 (NCT04184622): up to ~20.9% weight loss at 72 weeks (NEJM 2022); SURMOUNT-4 maintenance (JAMA 2024).",
+      "source_ids": ["NCT04184622", "35658024", "38078870", "CHEMBL4297839"]
+    },
+    {
+      "asset_name": "Orforglipron (LY3502970)",
+      "company": "Eli Lilly",
+      "target": "GLP-1R",
+      "mechanism": "Oral once-daily non-peptide small-molecule GLP-1 receptor agonist",
+      "indication": "Obesity; type 2 diabetes",
+      "phase": "Phase 3",
+      "latest_readout": "ATTAIN-1 phase 3 obesity readout (NEJM 2025, PMID 40960239), ~11-12% weight loss as an oral agent.",
+      "source_ids": ["CHEMBL4446782", "40960239", "40481478"]
+    },
+    {
+      "asset_name": "Retatrutide (LY3437943)",
+      "company": "Eli Lilly",
+      "target": "GLP-1R/GIPR/GCGR",
+      "mechanism": "Triple agonist of GLP-1, GIP and glucagon receptors (once-weekly peptide)",
+      "indication": "Obesity; type 2 diabetes; MASH",
+      "phase": "Phase 3",
+      "latest_readout": "Phase 2 (NCT04881760): up to ~24% weight loss at 48 weeks (NEJM 2023); phase 3 TRIUMPH ongoing.",
+      "source_ids": ["CHEMBL5095485", "37366315", "NCT04881760", "NCT05929066"]
+    },
+    {
+      "asset_name": "CagriSema (cagrilintide + semaglutide)",
+      "company": "Novo Nordisk",
+      "target": "GLP-1R + amylin",
+      "mechanism": "Fixed-dose cagrilintide (long-acting amylin analog) + semaglutide",
+      "indication": "Obesity; type 2 diabetes",
+      "phase": "Phase 3",
+      "latest_readout": "REDEFINE 1 (NCT05567796): ~20-23% weight loss (NEJM 2025).",
+      "source_ids": ["CHEMBL4802169", "40544433", "NCT05567796"]
+    },
+    {
+      "asset_name": "Survodutide (BI 456906)",
+      "company": "Boehringer Ingelheim / Zealand Pharma",
+      "target": "GLP-1R/GCGR",
+      "mechanism": "Dual glucagon (GCGR) and GLP-1 receptor agonist",
+      "indication": "Obesity; MASH",
+      "phase": "Phase 3",
+      "latest_readout": "Phase 2: up to ~18.7% weight loss; phase 3 SYNCHRONIZE ongoing (Diabetes Obes Metab 2025).",
+      "source_ids": ["CHEMBL5314776", "39821928"]
+    },
+    {
+      "asset_name": "Danuglipron (PF-06882961)",
+      "company": "Pfizer",
+      "target": "GLP-1R",
+      "mechanism": "Oral small-molecule GLP-1 receptor agonist",
+      "indication": "Obesity; type 2 diabetes",
+      "phase": "Phase 2 (discontinued)",
+      "latest_readout": "Program discontinued in 2025 after a liver-enzyme safety signal (Diabetes Obes Metab 2025).",
+      "source_ids": ["CHEMBL4518483", "40539310", "NCT04617275"]
+    }
+  ],
+  "narrative_claims": [
+    { "text": "Tirzepatide, a dual GIP/GLP-1 receptor agonist, achieved up to ~20.9% mean weight loss at 72 weeks in SURMOUNT-1 and is approved for obesity.", "source_ids": ["NCT04184622", "35658024"] },
+    { "text": "Once-weekly semaglutide 2.4 mg (Wegovy) produced ~14.9% weight loss at 68 weeks in STEP 1 and is FDA-approved for chronic weight management.", "source_ids": ["NCT03548935", "33567185"] },
+    { "text": "Orforglipron is an oral, once-daily non-peptide GLP-1 receptor agonist in phase 3, with an ATTAIN-1 obesity readout published in NEJM in 2025.", "source_ids": ["CHEMBL4446782", "40960239"] },
+    { "text": "Retatrutide, a GLP-1/GIP/glucagon triple agonist, reached ~24% weight loss at 48 weeks in phase 2 — the highest reported for an incretin to date.", "source_ids": ["37366315", "NCT04881760"] },
+    { "text": "CagriSema combines the amylin analog cagrilintide with semaglutide and showed ~20-23% weight loss in the phase 3 REDEFINE 1 trial.", "source_ids": ["CHEMBL4802169", "40544433", "NCT05567796"] },
+    { "text": "Survodutide is a glucagon/GLP-1 receptor dual agonist in phase 3 (SYNCHRONIZE) for obesity and MASH.", "source_ids": ["CHEMBL5314776", "39821928"] },
+    { "text": "Pfizer discontinued the oral GLP-1 agonist danuglipron in 2025 following a liver-enzyme safety signal.", "source_ids": ["40539310", "CHEMBL4518483"] },
+    { "text": "GLP1R (ENSG00000112164) is the primary molecular target of GLP-1 receptor agonists and a co-target of the dual and triple incretin agonists.", "source_ids": ["OT:ENSG00000112164"] },
+    { "text": "Tirzepatide is also approved as a first-line therapy for type 1 diabetes.", "source_ids": ["NCT99999999"] }
+  ]
+}

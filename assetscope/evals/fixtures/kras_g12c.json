@@ -1,0 +1,99 @@
+{
+  "_comment": "Replay fixture for the KRAS G12C oncology query. garsorasib is intentionally omitted (asset recall < 100%); the final claim cites a non-retrieved source and is dropped by the guard.",
+  "tool_calls": 11,
+  "valid_source_ids": [
+    "CHEMBL4535757", "CHEMBL4594350", "CHEMBL5095236", "CHEMBL5077861",
+    "CHEMBL5314518", "CHEMBL5095066", "CHEMBL6068410", "CHEMBL4858364",
+    "NCT03600883", "NCT04303780", "NCT05920356", "NCT06252649", "NCT03785249",
+    "NCT04685135", "NCT05853575", "NCT05789082", "NCT07541170", "NCT04699188",
+    "NCT05132075", "NCT05009329", "NCT06008288", "NCT07339839", "NCT05737706",
+    "NCT05379985", "NCT06625320", "NCT06881784", "NCT05462717", "NCT06128551",
+    "NCT06040541",
+    "34096690", "36764316", "35658005", "36546659", "37611121", "38870979",
+    "39762419", "42090791", "42135489",
+    "OT:ENSG00000133703"
+  ],
+  "assets": [
+    {
+      "asset_name": "Sotorasib (Lumakras / Lumykras)",
+      "company": "Amgen",
+      "target": "KRAS G12C",
+      "mechanism": "Covalent (irreversible) inhibitor trapping GDP-bound KRAS G12C via Cys12",
+      "indication": "NSCLC (2L+); colorectal cancer (with panitumumab)",
+      "phase": "Approved",
+      "latest_readout": "CodeBreaK 200 (NCT04303780): improved PFS vs docetaxel, no significant OS benefit (Lancet 2023); CodeBreaK 100 ORR ~37% (NEJM 2021).",
+      "source_ids": ["CHEMBL4535757", "34096690", "36764316", "NCT04303780", "NCT03600883"]
+    },
+    {
+      "asset_name": "Adagrasib (Krazati)",
+      "company": "Mirati Therapeutics (Bristol Myers Squibb)",
+      "target": "KRAS G12C",
+      "mechanism": "Covalent (irreversible) inhibitor of GDP-bound KRAS G12C; CNS-penetrant",
+      "indication": "NSCLC (2L+); colorectal cancer (accelerated approval with cetuximab)",
+      "phase": "Approved",
+      "latest_readout": "KRYSTAL-12 (NCT04685135): PFS vs docetaxel; KRYSTAL-1 NSCLC ORR ~43% (NEJM 2022); CRC + cetuximab (NEJM 2023).",
+      "source_ids": ["CHEMBL4594350", "35658005", "36546659", "NCT04685135", "NCT03785249"]
+    },
+    {
+      "asset_name": "Divarasib (GDC-6036)",
+      "company": "Genentech / Roche",
+      "target": "KRAS G12C",
+      "mechanism": "Covalent (irreversible) next-generation KRAS G12C inhibitor",
+      "indication": "NSCLC and colorectal cancer; adjuvant program",
+      "phase": "Phase 3 (also Phase 1/2 ongoing)",
+      "latest_readout": "Single-agent phase 1: ORR 53.4% in NSCLC (NEJM 2023, PMID 37611121); advancing to phase 3 incl. adjuvant.",
+      "source_ids": ["CHEMBL5095236", "37611121", "NCT05789082", "NCT07541170"]
+    },
+    {
+      "asset_name": "Opnurasib (JDQ443)",
+      "company": "Novartis",
+      "target": "KRAS G12C",
+      "mechanism": "Covalent (irreversible) KRAS G12C inhibitor (structurally distinct)",
+      "indication": "NSCLC; broader solid tumors",
+      "phase": "Phase 3",
+      "latest_readout": "KontRASt-01 confirmed ORR ~41.7%; advanced to phase 3 KontRASt-02 vs docetaxel (NCT05132075).",
+      "source_ids": ["CHEMBL5077861", "NCT04699188", "NCT05132075"]
+    },
+    {
+      "asset_name": "Glecirasib (JAB-21822)",
+      "company": "Jacobio Pharmaceuticals",
+      "target": "KRAS G12C",
+      "mechanism": "Covalent (irreversible) KRAS G12C inhibitor",
+      "indication": "NSCLC (China registrational); pancreatic cancer",
+      "phase": "Phase 2 (registrational in China)",
+      "latest_readout": "Phase 2b NSCLC: ORR ~47.9% (Nature Medicine 2025, PMID 39762419).",
+      "source_ids": ["CHEMBL5314518", "39762419", "NCT05009329"]
+    },
+    {
+      "asset_name": "Daraxonrasib (RMC-6236)",
+      "company": "Revolution Medicines",
+      "target": "Pan-RAS (RAS(ON))",
+      "mechanism": "Oral non-covalent RAS(ON) tri-complex inhibitor (cyclophilin A) targeting the active GTP-bound state",
+      "indication": "Pancreatic ductal adenocarcinoma; NSCLC (RAS-mutant)",
+      "phase": "Phase 3",
+      "latest_readout": "Positive phase 3 in previously treated RAS-mutant metastatic PDAC (NEJM 2026, PMID 42090791); RASolve 301 NSCLC ongoing.",
+      "source_ids": ["42090791", "42135489", "NCT06625320", "NCT06881784", "NCT05379985"]
+    },
+    {
+      "asset_name": "MRTX1133",
+      "company": "Mirati Therapeutics (Bristol Myers Squibb)",
+      "target": "KRAS G12D",
+      "mechanism": "Non-covalent selective KRAS G12D inhibitor (switch-II pocket)",
+      "indication": "Pancreatic ductal adenocarcinoma and other G12D solid tumors",
+      "phase": "Phase 1 (lead study terminated)",
+      "latest_readout": "First selective G12D inhibitor in the clinic; lead phase 1/2 (NCT05737706) terminated.",
+      "source_ids": ["CHEMBL4858364", "NCT05737706"]
+    }
+  ],
+  "narrative_claims": [
+    { "text": "Two covalent KRAS G12C inhibitors are FDA-approved: sotorasib (Amgen) and adagrasib (Mirati/BMS), both for previously treated KRAS G12C NSCLC.", "source_ids": ["CHEMBL4535757", "CHEMBL4594350", "34096690", "35658005"] },
+    { "text": "In confirmatory phase 3, CodeBreaK 200 and KRYSTAL-12 each improved PFS versus docetaxel but neither demonstrated a clear overall-survival benefit.", "source_ids": ["36764316", "NCT04685135"] },
+    { "text": "Divarasib (Genentech/Roche) reported a best-in-class ~53% objective response rate in KRAS G12C NSCLC in a phase 1 study published in NEJM in 2023.", "source_ids": ["37611121", "CHEMBL5095236"] },
+    { "text": "Daraxonrasib (RMC-6236), an oral pan-RAS(ON) tri-complex inhibitor, delivered a positive phase 3 readout in previously treated RAS-mutant metastatic pancreatic cancer in 2026.", "source_ids": ["42090791", "NCT06625320"] },
+    { "text": "MRTX1133 was the first selective non-covalent KRAS G12D inhibitor in the clinic, though its lead phase 1 trial was terminated.", "source_ids": ["CHEMBL4858364", "NCT05737706"] },
+    { "text": "Opnurasib (Novartis, JDQ443) advanced to the phase 3 KontRASt-02 trial versus docetaxel in KRAS G12C NSCLC.", "source_ids": ["CHEMBL5077861", "NCT05132075"] },
+    { "text": "Glecirasib (Jacobio) showed roughly 48% ORR in KRAS G12C NSCLC in a phase 2b trial (Nature Medicine 2025).", "source_ids": ["39762419", "CHEMBL5314518"] },
+    { "text": "KRAS (ENSG00000133703) is most strongly associated with pancreatic, colorectal and lung carcinomas in Open Targets.", "source_ids": ["OT:ENSG00000133703"] },
+    { "text": "Sotorasib is also approved for KRAS G12D-mutant pancreatic cancer.", "source_ids": ["NCT00000000"] }
+  ]
+}

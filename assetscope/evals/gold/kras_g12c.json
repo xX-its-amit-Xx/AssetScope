@@ -1,0 +1,108 @@
+{
+  "id": "kras_g12c",
+  "query": "Competitive landscape for KRAS G12C inhibitors in oncology",
+  "notes": "Hand-curated from ClinicalTrials.gov v2, ChEMBL v34 and PubMed (verified mid-2026).",
+  "assets": [
+    {
+      "name": "sotorasib",
+      "aliases": ["lumakras", "lumykras", "AMG 510"],
+      "facts": {
+        "company": ["Amgen"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent", "irreversible"],
+        "phase": ["Approved"],
+        "latest_readout": ["CodeBreaK"]
+      },
+      "sources": ["CHEMBL4535757", "34096690", "36764316", "NCT04303780"]
+    },
+    {
+      "name": "adagrasib",
+      "aliases": ["krazati", "MRTX849"],
+      "facts": {
+        "company": ["Mirati", "Bristol Myers Squibb", "BMS"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent", "irreversible"],
+        "phase": ["Approved"],
+        "latest_readout": ["KRYSTAL"]
+      },
+      "sources": ["CHEMBL4594350", "35658005", "36546659", "NCT04685135"]
+    },
+    {
+      "name": "divarasib",
+      "aliases": ["GDC-6036"],
+      "facts": {
+        "company": ["Genentech", "Roche"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent"],
+        "phase": ["Phase 3", "Phase 1"],
+        "latest_readout": ["53", "NEJM 2023"]
+      },
+      "sources": ["CHEMBL5095236", "37611121"]
+    },
+    {
+      "name": "opnurasib",
+      "aliases": ["JDQ443"],
+      "facts": {
+        "company": ["Novartis"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["KontRASt"]
+      },
+      "sources": ["CHEMBL5077861", "NCT05132075"]
+    },
+    {
+      "name": "glecirasib",
+      "aliases": ["JAB-21822"],
+      "facts": {
+        "company": ["Jacobio"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent"],
+        "phase": ["Phase 2"],
+        "latest_readout": ["Nature Medicine", "phase 2"]
+      },
+      "sources": ["CHEMBL5314518", "39762419"]
+    },
+    {
+      "name": "garsorasib",
+      "aliases": ["D-1553"],
+      "facts": {
+        "company": ["InventisBio"],
+        "target": ["KRAS G12C", "G12C"],
+        "mechanism": ["covalent"],
+        "phase": ["Phase 2"],
+        "latest_readout": ["Lancet", "phase 2"]
+      },
+      "sources": ["CHEMBL5095066", "38870979"]
+    },
+    {
+      "name": "daraxonrasib",
+      "aliases": ["RMC-6236"],
+      "facts": {
+        "company": ["Revolution Medicines"],
+        "target": ["pan-RAS", "RAS(ON)", "RAS"],
+        "mechanism": ["tri-complex", "ON state", "non-covalent"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["pancreatic", "NEJM 2026"]
+      },
+      "sources": ["42090791", "NCT06625320", "NCT06881784"]
+    },
+    {
+      "name": "MRTX1133",
+      "aliases": ["mrtx1133"],
+      "facts": {
+        "company": ["Mirati", "Bristol Myers Squibb", "BMS"],
+        "target": ["KRAS G12D", "G12D"],
+        "mechanism": ["non-covalent"],
+        "phase": ["Phase 1", "terminated"],
+        "latest_readout": ["pancreatic", "PDAC", "terminated"]
+      },
+      "sources": ["CHEMBL4858364", "NCT05737706"]
+    }
+  ],
+  "contradictions": [
+    { "terms": ["sotorasib", "G12D"], "note": "Sotorasib targets KRAS G12C, not G12D." },
+    { "terms": ["MRTX1133", "approved"], "note": "MRTX1133 is not approved; its lead trial was terminated." },
+    { "terms": ["adagrasib", "reversible"], "note": "Adagrasib is a covalent IRREVERSIBLE inhibitor." }
+  ]
+}

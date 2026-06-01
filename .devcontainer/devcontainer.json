@@ -1,0 +1,17 @@
+{
+  "name": "AssetScope",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.11" },
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" }
+  },
+  "forwardPorts": [8000, 8080, 5432, 11434],
+  "portsAttributes": {
+    "8000": { "label": "AssetScope API" },
+    "8080": { "label": "AssetScope UI" },
+    "11434": { "label": "Ollama (local LLM)" }
+  },
+  "hostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
+  "postCreateCommand": "curl -fsSL https://ollama.com/install.sh | sh"
+}

@@ -1,0 +1,108 @@
+{
+  "id": "glp1_obesity",
+  "query": "Competitive landscape for GLP-1 receptor agonists and incretin agonists in obesity",
+  "notes": "Hand-curated from ClinicalTrials.gov v2, ChEMBL v34 and PubMed (verified mid-2026). Term lists are acceptable substrings; the first is canonical.",
+  "assets": [
+    {
+      "name": "semaglutide",
+      "aliases": ["wegovy", "ozempic"],
+      "facts": {
+        "company": ["Novo Nordisk", "Novo"],
+        "target": ["GLP-1R", "GLP-1 receptor"],
+        "mechanism": ["GLP-1 receptor agonist", "agonist"],
+        "phase": ["Approved"],
+        "latest_readout": ["STEP 1", "STEP"]
+      },
+      "sources": ["NCT03548935", "33567185", "CHEMBL2108724"]
+    },
+    {
+      "name": "tirzepatide",
+      "aliases": ["zepbound", "mounjaro"],
+      "facts": {
+        "company": ["Eli Lilly", "Lilly"],
+        "target": ["GIP", "GLP-1R/GIPR", "GIPR"],
+        "mechanism": ["dual", "GIP and GLP-1"],
+        "phase": ["Approved"],
+        "latest_readout": ["SURMOUNT-1", "SURMOUNT"]
+      },
+      "sources": ["NCT04184622", "35658024", "CHEMBL4297839"]
+    },
+    {
+      "name": "orforglipron",
+      "aliases": ["LY3502970"],
+      "facts": {
+        "company": ["Eli Lilly", "Lilly"],
+        "target": ["GLP-1R", "GLP-1 receptor"],
+        "mechanism": ["oral", "small-molecule", "small molecule"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["ATTAIN"]
+      },
+      "sources": ["CHEMBL4446782", "40960239"]
+    },
+    {
+      "name": "retatrutide",
+      "aliases": ["LY3437943"],
+      "facts": {
+        "company": ["Eli Lilly", "Lilly"],
+        "target": ["GCGR", "GLP-1R/GIPR/GCGR"],
+        "mechanism": ["triple"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["24", "TRIUMPH"]
+      },
+      "sources": ["CHEMBL5095485", "37366315", "NCT04881760"]
+    },
+    {
+      "name": "cagrisema",
+      "aliases": ["cagrilintide"],
+      "facts": {
+        "company": ["Novo Nordisk", "Novo"],
+        "target": ["amylin"],
+        "mechanism": ["amylin", "cagrilintide"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["REDEFINE"]
+      },
+      "sources": ["CHEMBL4802169", "40544433", "NCT05567796"]
+    },
+    {
+      "name": "survodutide",
+      "aliases": ["BI 456906"],
+      "facts": {
+        "company": ["Boehringer Ingelheim", "Zealand"],
+        "target": ["GCGR", "glucagon"],
+        "mechanism": ["glucagon", "dual"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["SYNCHRONIZE", "phase 2"]
+      },
+      "sources": ["CHEMBL5314776", "39821928"]
+    },
+    {
+      "name": "danuglipron",
+      "aliases": ["PF-06882961"],
+      "facts": {
+        "company": ["Pfizer"],
+        "target": ["GLP-1R", "GLP-1 receptor"],
+        "mechanism": ["oral"],
+        "phase": ["discontinued", "Phase 2"],
+        "latest_readout": ["liver", "discontinued"]
+      },
+      "sources": ["CHEMBL4518483", "40539310", "NCT04617275"]
+    },
+    {
+      "name": "mazdutide",
+      "aliases": ["IBI362", "LY3305677"],
+      "facts": {
+        "company": ["Innovent"],
+        "target": ["GCGR", "glucagon"],
+        "mechanism": ["glucagon", "dual", "oxyntomodulin"],
+        "phase": ["Phase 3"],
+        "latest_readout": ["GLORY-1", "GLORY"]
+      },
+      "sources": ["CHEMBL5095358", "40421736", "NCT05607680"]
+    }
+  ],
+  "contradictions": [
+    { "terms": ["danuglipron", "approved"], "note": "Danuglipron was discontinued in 2025, never approved." },
+    { "terms": ["orforglipron", "injectable"], "note": "Orforglipron is an ORAL small molecule, not injectable." },
+    { "terms": ["semaglutide", "small-molecule"], "note": "Semaglutide is a peptide, not a small molecule." }
+  ]
+}
