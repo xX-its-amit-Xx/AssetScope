@@ -1,4 +1,4 @@
-import type { AgentEvent } from "./types";
+import type { AgentEvent, Landscape, LandscapeSummary } from "./types";
 
 export const API_BASE: string =
   (import.meta as any).env?.VITE_API_BASE ?? "http://localhost:8000";
@@ -7,6 +7,18 @@ export async function fetchHealth(): Promise<any> {
   const r = await fetch(`${API_BASE}/health`);
   if (!r.ok) throw new Error(`health ${r.status}`);
   return r.json();
+}
+
+export async function listLandscapes(): Promise<LandscapeSummary[]> {
+  const r = await fetch(`${API_BASE}/landscapes`);
+  if (!r.ok) return [];
+  return r.json();
+}
+
+export async function loadLandscape(id: string): Promise<Landscape> {
+  const r = await fetch(`${API_BASE}/landscapes/${id}`);
+  if (!r.ok) throw new Error(`load ${r.status}`);
+  return (await r.json()).landscape as Landscape;
 }
 
 /**

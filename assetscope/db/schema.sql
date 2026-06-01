@@ -41,3 +41,19 @@ CREATE INDEX IF NOT EXISTS chunks_tsv_gin
     ON chunks USING gin (tsv);
 
 CREATE INDEX IF NOT EXISTS chunks_document_id ON chunks (document_id);
+
+-- Saved competitive landscapes (history library; basis for diff/watchlists).
+-- Also created on first use by assetscope/storage.py (CREATE TABLE IF NOT EXISTS).
+CREATE TABLE IF NOT EXISTS landscapes (
+    id             TEXT PRIMARY KEY,
+    query          TEXT NOT NULL,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    backend        TEXT NOT NULL DEFAULT '',
+    model          TEXT NOT NULL DEFAULT '',
+    tool_calls     INT NOT NULL DEFAULT 0,
+    n_assets       INT NOT NULL DEFAULT 0,
+    dropped_claims INT NOT NULL DEFAULT 0,
+    landscape      JSONB NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS landscapes_created_at ON landscapes (created_at DESC);

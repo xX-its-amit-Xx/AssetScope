@@ -69,6 +69,15 @@ export interface AgentEvent {
   data: Record<string, any>;
 }
 
+export interface LandscapeSummary {
+  id: string;
+  query: string;
+  created_at: string;
+  n_assets: number;
+  tool_calls: number;
+  dropped_claims: number;
+}
+
 export interface GuardReport {
   total_claims: number;
   supported_claims: number;

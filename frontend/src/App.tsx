@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { streamQuery } from "./api";
+import { useEffect, useRef, useState } from "react";
+import { listLandscapes, loadLandscape, streamQuery } from "./api";
 import {
   buildCiteIndex,
   GuardBar,
@@ -9,7 +9,7 @@ import {
   ToolTrace,
   type TraceEntry,
 } from "./components";
-import type { GuardReport, Landscape } from "./types";
+import type { GuardReport, Landscape, LandscapeSummary } from "./types";
 
 const EXAMPLES = [
   "competitive landscape for oral GLP-1 agonists in obesity",
@@ -26,7 +26,25 @@ export function App() {
   const [guard, setGuard] = useState<GuardReport | null>(null);
   const [landscape, setLandscape] = useState<Landscape | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [history, setHistory] = useState<LandscapeSummary[]>([]);
   const abortRef = useRef<AbortController | null>(null);
+
+  function refreshHistory() {
+    listLandscapes().then(setHistory).catch(() => {});
+  }
+  useEffect(refreshHistory, []);
+
+  async function openSaved(id: string) {
+    if (running) return;
+    reset();
+    try {
+      const ls = await loadLandscape(id);
+      setLandscape(ls);
+      setStatus("Loaded from library.");
+    } catch (e: any) {
+      setError(String(e?.message ?? e));
+    }
+  }
 
   function reset() {
     setPlan([]);
@@ -91,6 +109,7 @@ export function App() {
       if (e?.name !== "AbortError") setError(String(e?.message ?? e));
     } finally {
       setRunning(false);
+      refreshHistory();
     }
   }
 
@@ -135,6 +154,26 @@ export function App() {
           </button>
         ))}
       </div>
+
+      {history.length > 0 && (
+        <div className="section history">
+          <h2>History ({history.length})</h2>
+          <div className="card">
+            {history.slice(0, 12).map((h) => (
+              <button
+                key={h.id}
+                className="history-item"
+                onClick={() => openSaved(h.id)}
+                disabled={running}
+                title={`${new Date(h.created_at).toLocaleString()} · open without re-running`}
+              >
+                <span className="hq">{h.query}</span>
+                <span className="hm">{h.n_assets} assets · {h.tool_calls} calls</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {running && (
         <div className="msg">

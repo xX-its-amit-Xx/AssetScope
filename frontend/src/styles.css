@@ -108,6 +108,23 @@ a:hover { text-decoration: underline; }
   color: var(--danger);
   border: 1px solid var(--danger);
 }
+.history .card { display: flex; flex-direction: column; gap: 6px; padding: 10px; }
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+}
+.history-item:hover { border-color: var(--accent); }
+.history-item .hq { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-item .hm { color: var(--muted); font-size: 11px; white-space: nowrap; }
 
 .card {
   background: var(--panel);

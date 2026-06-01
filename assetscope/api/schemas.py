@@ -28,3 +28,13 @@ class HealthResponse(BaseModel):
 
 class QueryResponse(BaseModel):
     landscape: Landscape
+    id: str | None = None  # persisted landscape id, if saved
+
+
+class LandscapeSummary(BaseModel):
+    id: str
+    query: str
+    created_at: str
+    n_assets: int
+    tool_calls: int
+    dropped_claims: int
