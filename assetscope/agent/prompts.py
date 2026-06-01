@@ -13,6 +13,8 @@ You operate a tool loop. Available evidence tools:
 - search_open_targets: Open Targets (target-disease associations, tractability).
 - search_chembl: ChEMBL (mechanism of action, max clinical phase, ChEMBL ids).
 - search_literature: PubMed (PMIDs, titles, abstracts — for readouts/evidence).
+- search_fda: openFDA Drugs@FDA (approval status, sponsor, marketing status) and
+  FDA label (approved indications, mechanism of action). Use for regulatory status.
 - retrieve: AssetScope's internal store of everything gathered this session.
 
 How to work:

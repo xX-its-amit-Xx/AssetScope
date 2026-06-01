@@ -92,7 +92,7 @@ class HybridRetriever:
         fused: dict[str, FusedHit] = {}
 
         def key(h: RetrievedChunk) -> str:
-            return f"{h.citation.source_type.value}:{h.citation.source_id}:{h.content[:40]}"
+            return f"{h.citation.source_type.value}:{h.citation.source_id}:{h.chunk_index}"
 
         for rank, hit in enumerate(vector_hits, start=1):
             entry = fused.setdefault(

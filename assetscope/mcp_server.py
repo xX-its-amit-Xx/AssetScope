@@ -19,6 +19,7 @@ from mcp.server.fastmcp import FastMCP
 from assetscope.tools import (
     ChemblTool,
     ClinicalTrialsTool,
+    FdaTool,
     LiteratureTool,
     OpenTargetsTool,
     RetrieveTool,
@@ -30,6 +31,7 @@ _clinical = ClinicalTrialsTool()
 _open_targets = OpenTargetsTool()
 _chembl = ChemblTool()
 _literature = LiteratureTool()
+_fda = FdaTool()
 _retrieve = RetrieveTool()
 
 
@@ -61,6 +63,13 @@ def search_chembl(compound_or_target: str, max_results: int = 5) -> dict:
 def search_literature(query: str, max_results: int = 6) -> dict:
     """Search PubMed for articles (PMID, title, journal, year, abstract)."""
     return _dump(_literature.run(query=query, max_results=max_results))
+
+
+@mcp.tool()
+def search_fda(drug: str, max_results: int = 3) -> dict:
+    """openFDA: Drugs@FDA approval status, sponsor, marketing status, and the
+    FDA-labeled indications + mechanism of action for a drug."""
+    return _dump(_fda.run(drug=drug, max_results=max_results))
 
 
 @mcp.tool()

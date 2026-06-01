@@ -27,6 +27,10 @@ from assetscope.models import Asset, Claim, Landscape, ToolResult
 
 logger = logging.getLogger("assetscope.agent")
 
+
+class AgentError(RuntimeError):
+    """Raised when a run fails to produce any usable landscape."""
+
 _MAX_RESULT_CHARS = 320   # per evidence item appended back to the model
 _MAX_RESULT_ITEMS = 6     # items echoed to the model (the rest still get ingested)
 
@@ -81,10 +85,16 @@ class AssetScopeAgent:
 
     # -- public API --------------------------------------------------------
     def run_to_completion(self, query: str) -> Landscape:
-        for _ in self.run(query):
-            pass
-        assert self.last_landscape is not None
-        return self.last_landscape
+        error_msg: str | None = None
+        for ev in self.run(query):
+            if ev.type == EventType.ERROR:
+                error_msg = ev.data.get("message")
+        ls = self.last_landscape
+        # Raise (don't return an empty 200) if the run errored without producing
+        # anything, so API callers can map it to a real error status.
+        if ls is None or (error_msg and not ls.assets and not ls.claims):
+            raise AgentError(error_msg or "Agent produced no landscape.")
+        return ls
 
     def run(self, query: str) -> Iterator[AgentEvent]:
         ledger = CitationLedger()
@@ -109,12 +119,13 @@ class AssetScopeAgent:
         submission: dict | None = None
         nudges = 0
         iterations = 0
+        force_next = False  # set when a stalling model must be compelled to finalize
 
         for _ in range(self.settings.max_iterations):
             iterations += 1
-            force_submit = tool_calls >= self.settings.max_tool_calls
+            force_submit = force_next or tool_calls >= self.settings.max_tool_calls
             if force_submit:
-                yield AgentEvent.status("Budget reached — forcing finalization.")
+                yield AgentEvent.status("Forcing finalization (budget/stall).")
 
             try:
                 resp = self._create(messages, tools, force_submit)
@@ -136,11 +147,11 @@ class AssetScopeAgent:
                     tool_uses.append(block)
             messages.append({"role": "assistant", "content": assistant_content})
 
-            # No tool call this turn -> nudge toward finalizing.
+            # No tool call this turn -> nudge, and actually compel a submit next turn.
             if not tool_uses:
                 nudges += 1
                 if nudges >= 2:
-                    force_submit = True
+                    force_next = True  # next _create will force tool_choice=submit_landscape
                 messages.append(
                     {
                         "role": "user",
@@ -149,7 +160,10 @@ class AssetScopeAgent:
                     }
                 )
                 if nudges >= 3:
-                    yield AgentEvent.status("Model did not finalize; stopping.")
+                    yield AgentEvent.error(
+                        "The model stalled without calling submit_landscape; returning the "
+                        "best landscape assembled so far (may be empty)."
+                    )
                     break
                 continue
 

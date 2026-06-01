@@ -35,8 +35,8 @@ def test_drops_unsupported_claims():
     c3 = next(c for c in cleaned.claims if c.text == "C works")
     assert c3.source_ids == ["NCT1"]
     assert "GHOST" in c3.guard_note
-    # citation coverage = supported / kept claims
-    assert report.citation_coverage == 1.0
+    # coverage = supported / ALL submitted claims (dropped counts against it): 2 of 3
+    assert round(report.citation_coverage, 3) == 0.667
 
 
 def test_flags_unsupported_asset_rows():

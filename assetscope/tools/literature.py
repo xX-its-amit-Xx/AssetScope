@@ -114,7 +114,11 @@ class LiteratureTool(Tool):
 
         items: list[EvidenceItem] = []
         for pmid in idlist:
-            meta = articles.get(pmid, {})
+            meta = articles.get(pmid)
+            if not meta:
+                # efetch returned no record for this PMID (embargoed/retracted/
+                # truncated batch) — don't emit a citable item with no content.
+                continue
             title = meta.get("title") or f"PMID {pmid}"
             journal = meta.get("journal", "")
             year = meta.get("year", "")

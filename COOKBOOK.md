@@ -103,7 +103,7 @@ matching ledger source and **dropped it**. Delivered citation coverage: **100%**
 
 ```
 | query        | fact_P | fact_R | cite_cov | halluc | assets | tools | dropped |
-| glp1_obesity | 100.0% |  87.5% | 100.0%   |   0.0% | 7/8    | 10    | 1       |
+| glp1_obesity | 100.0% |  87.5% |  88.9%   |   6.2% | 7/8    | 10    | 1       |
 ```
 
 ---
@@ -176,7 +176,7 @@ eval harness would also flag it if it slipped through grounded.
 
 ```
 | query     | fact_P | fact_R | cite_cov | halluc | assets | tools | dropped |
-| kras_g12c | 100.0% |  87.5% | 100.0%   |   0.0% | 7/8    | 11    | 1       |
+| kras_g12c | 100.0% |  87.5% |  88.9%   |   6.2% | 7/8    | 11    | 1       |
 ```
 
 ---
@@ -248,7 +248,7 @@ Cys481”* — was unsupported and contradicts its own grounded mechanism
 
 ```
 | query          | fact_P | fact_R | cite_cov | halluc | assets | tools | dropped |
-| btk_inhibitors | 100.0% |  87.5% | 100.0%   |   0.0% | 7/8    | 12    | 1       |
+| btk_inhibitors | 100.0% |  87.5% |  88.9%   |   6.2% | 7/8    | 12    | 1       |
 ```
 
 ---
@@ -262,11 +262,15 @@ $ python -m assetscope.evals run
   factual_recall        87.5%
   grounded_recall       87.5%
   asset_recall          87.5%
-  citation_coverage    100.0%
-  hallucination_rate     0.0%
+  citation_coverage     88.9%
+  hallucination_rate     6.2%
   avg_tool_calls       11.0
   avg_calls_per_asset  1.57
 ```
+
+> citation_coverage / hallucination are scored on the agent's **pre-guard**
+> output (each fixture has one over-reaching claim), so they're <100% / >0%; the
+> reliability guard then drops that claim (`dropped = 1`).
 
 ---
 
@@ -337,7 +341,7 @@ assetscope-mcp          # stdio transport (or: python -m assetscope.mcp_server)
 
 **Cursor** — Settings → MCP → add a server with command `assetscope-mcp`.
 
-Restart the client; you'll get six tools:
+Restart the client; you'll get seven tools:
 
 | MCP tool | What it does |
 |---|---|
@@ -345,6 +349,7 @@ Restart the client; you'll get six tools:
 | `search_open_targets` | Open Targets associations + tractability |
 | `search_chembl` | ChEMBL mechanism / phase / IDs |
 | `search_literature` | PubMed PMIDs + abstracts |
+| `search_fda` | openFDA Drugs@FDA approval/sponsor/marketing status + label indications & MoA |
 | `retrieve` | Hybrid search over the internal store |
 | `build_landscape` | Run the full agent → citation-grounded landscape (needs `ANTHROPIC_API_KEY`) |
 

@@ -37,8 +37,13 @@ export function App() {
     setStatus("");
   }
 
+  function stop() {
+    abortRef.current?.abort();
+  }
+
   async function run(q: string) {
     if (!q.trim() || running) return;
+    abortRef.current?.abort(); // cancel any in-flight run
     reset();
     setRunning(true);
     const ctrl = new AbortController();
@@ -116,6 +121,11 @@ export function App() {
         <button type="submit" disabled={running || !query.trim()}>
           {running ? "Researching…" : "Run"}
         </button>
+        {running && (
+          <button type="button" className="stop" onClick={stop} title="Cancel this run">
+            Stop
+          </button>
+        )}
       </form>
 
       <div className="examples">
@@ -136,12 +146,16 @@ export function App() {
 
       <PlanTrace plan={plan} />
       <ToolTrace entries={trace} />
-      {guard && <GuardBar guard={guard} toolCalls={landscape?.tool_calls ?? 0} />}
-      {landscape && landscape.assets.length > 0 && (
+      {/* On a backend error, suppress the (empty) guard/landscape panels. */}
+      {guard && !error && <GuardBar guard={guard} toolCalls={landscape?.tool_calls ?? 0} />}
+      {!error && landscape && landscape.assets.length > 0 && (
         <>
           <LandscapeTable landscape={landscape} idx={idx} />
           <Narrative landscape={landscape} idx={idx} />
         </>
+      )}
+      {!running && !error && landscape && landscape.assets.length === 0 && (
+        <div className="msg">No assets found for this query — try a more specific target/indication.</div>
       )}
 
       <div className="footer">

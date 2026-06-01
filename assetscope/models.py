@@ -22,6 +22,7 @@ class SourceType(str, Enum):
     OPEN_TARGETS = "open_targets"
     CHEMBL = "chembl"
     PUBMED = "pubmed"
+    FDA = "fda"  # openFDA: Drugs@FDA approvals + Structured Product Labeling
     INTERNAL = "internal"  # pgvector hybrid retrieval over ingested docs
 
 

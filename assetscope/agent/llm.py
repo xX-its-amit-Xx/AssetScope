@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from types import SimpleNamespace
 from typing import Any
 
@@ -69,10 +70,10 @@ def _extract_json_object(text: str) -> dict | None:
     """Return the first balanced top-level JSON object in ``text`` (tolerant of
     surrounding prose / markdown fences)."""
     t = text.strip()
-    if t.startswith("```"):
-        t = t.strip("`")
-        if t[:4].lower() == "json":
-            t = t[4:]
+    # Strip a leading ```lang fence and a trailing ``` fence if present (robustly,
+    # without str.strip('`') which can eat backticks inside JSON string values).
+    t = re.sub(r"^```[a-zA-Z0-9]*\n?", "", t)
+    t = re.sub(r"\n?```$", "", t).strip()
     try:
         obj = json.loads(t)
         if isinstance(obj, dict):

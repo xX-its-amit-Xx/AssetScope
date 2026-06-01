@@ -46,6 +46,7 @@ flowchart LR
       OT["search_open_targets<br/>Open Targets GraphQL"]
       CH["search_chembl<br/>ChEMBL REST"]
       LIT["search_literature<br/>PubMed E-utilities"]
+      FDA["search_fda<br/>openFDA Drugs@FDA + label"]
       RET["retrieve<br/>pgvector hybrid"]
     end
 
@@ -74,6 +75,7 @@ returns structured JSON **with source URLs/IDs** so answers can cite.
 | `search_open_targets(target_or_disease)` | [Open Targets GraphQL](https://platform.opentargets.org) | target↔disease associations, tractability (Ensembl IDs) | none |
 | `search_chembl(compound_or_target)` | [ChEMBL REST](https://www.ebi.ac.uk/chembl/) | molecule_chembl_id, max phase, mechanism of action, target | none |
 | `search_literature(query)` | [PubMed E-utilities](https://www.ncbi.nlm.nih.gov/books/NBK25501/) | PMID, title, journal, year, abstract | optional API key |
+| `search_fda(drug)` | [openFDA](https://open.fda.gov/) (Drugs@FDA + SPL label) | FDA approval status, sponsor, marketing status, NDA/BLA #, labeled indications + MoA, pharm class | optional API key |
 | `retrieve(query)` | internal pgvector store | best passages from everything gathered this session | n/a |
 
 ## Quickstart (one command)
@@ -158,30 +160,33 @@ checks. Current scorecard from the bundled replay fixtures, written to
 | **Factual recall** | **87.5%** |
 | Grounded recall | 87.5% |
 | Asset recall | 87.5% |
-| **Citation coverage** | **100.0%** |
-| **Hallucination rate** | **0.0%** |
+| **Citation coverage** | **88.9%** |
+| **Hallucination rate** | **6.2%** |
 | Avg tool calls / query | 11.0 |
 | Avg tool calls / asset | 1.57 |
 
-Per-query (note the guard **drops 1 over-reaching claim per landscape**):
+Per-query (the guard then **drops the 1 over-reaching claim per landscape**):
 
 | query | fact_P | fact_R | cite_cov | halluc | assets | tools | dropped |
 |---|---|---|---|---|---|---|---|
-| glp1_obesity | 100.0% | 87.5% | 100.0% | 0.0% | 7/8 | 10 | 1 |
-| kras_g12c | 100.0% | 87.5% | 100.0% | 0.0% | 7/8 | 11 | 1 |
-| btk_inhibitors | 100.0% | 87.5% | 100.0% | 0.0% | 7/8 | 12 | 1 |
+| glp1_obesity | 100.0% | 87.5% | 88.9% | 6.2% | 7/8 | 10 | 1 |
+| kras_g12c | 100.0% | 87.5% | 88.9% | 6.2% | 7/8 | 11 | 1 |
+| btk_inhibitors | 100.0% | 87.5% | 88.9% | 6.2% | 7/8 | 12 | 1 |
 
 **How to read this honestly.** The committed numbers come from **replay
 fixtures** — representative agent submissions assembled from the real public-API
 data (see [`assetscope/evals/fixtures/`](assetscope/evals/fixtures/)). Recall is
 < 100% because each fixture deliberately omits one gold asset (a realistic
-“agent missed one”), and each contains one unsupported claim that the **same
-reliability guard** used in production removes — which is why citation coverage is
-100% and hallucination 0% on the *delivered* answer. **Factual precision is a
-conservative lower bound**: a real asset absent from the (incomplete) hand-curated
-gold is not penalized as long as it is citation-grounded. Metric definitions live
-in [assetscope/evals/metrics.py](assetscope/evals/metrics.py). Use `--live` to
-reproduce against the real agent and APIs.
+“agent missed one”). **Citation coverage and hallucination are scored on the
+agent's *pre-guard* output**, so the one unsupported claim each fixture contains
+(cited a non-retrieved id) correctly shows up as ~89% coverage / ~6% hallucination
+— and the **same reliability guard** used in production then drops that claim
+(`dropped = 1`). This is deliberate: scoring the *delivered* (post-guard) answer
+would always read 100% / 0% and couldn't detect a guard escape. **Factual
+precision is a conservative lower bound**: a real asset absent from the
+(incomplete) hand-curated gold is not penalized as long as it is citation-grounded.
+Metric definitions live in [assetscope/evals/metrics.py](assetscope/evals/metrics.py).
+Use `--live` to reproduce against the real agent and APIs.
 
 See **[COOKBOOK.md](COOKBOOK.md)** for three full worked runs with real
 NCT/PMID/ChEMBL IDs.
@@ -261,6 +266,33 @@ uvicorn assetscope.api.main:app --reload
 # Frontend:
 cd frontend && npm install && npm run dev   # http://localhost:5173
 ```
+
+## Using the output: export & access control
+
+- **Export.** The landscape table has one-click **CSV** (opens in Excel; one row
+  per asset with source IDs *and* source URLs) and **Markdown** (table + cited
+  narrative + disclaimer) export — analysts can drop findings straight into a
+  spreadsheet or doc with citations intact.
+- **API keys.** `/query` and `/query/stream` accept an optional `X-API-Key` gate:
+  set `ASSETSCOPE_API_KEYS=key1,key2` to require it (left empty = open, for
+  localhost). `/health` stays open for orchestration.
+
+## Roadmap (production-readiness)
+
+The core is built and validated; these are the next high-value steps for a
+team deployment (prioritized from a competitive-intelligence-analyst audit):
+
+1. **Persist landscapes** to Postgres with a saved library/history (jsonb), so
+   runs are durable, shareable, and re-openable. *(Prerequisite for 2–4.)*
+2. **Diff over time** — compare two runs of the same query (new assets, phase
+   advances, fresh readouts). Turns a snapshot tool into a monitoring tool.
+3. **Watchlist + scheduled re-run + change alerts** (email/Slack on non-empty diff).
+4. **More sources** — Europe PMC (full-text + citation graph), PatentsView (IP /
+   patent-cliff landscape), RxNorm (drug-name normalization for cross-source dedup).
+5. **HTTP response cache + per-host rate limiting** (politeness + speed; the
+   429/Retry-After backoff is already in `tools/http.py`).
+6. **Cross-source asset dedup** (one canonical row per drug; the join key for diff)
+   and **per-claim confidence** (source count × tier × agreement).
 
 ## Limitations — honest caveats
 

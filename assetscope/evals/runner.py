@@ -24,11 +24,13 @@ from assetscope.models import Asset, Citation, Claim, Landscape, SourceType
 class EvalRun:
     query_id: str
     query: str
-    assets: list[dict] = field(default_factory=list)
-    claims: list[dict] = field(default_factory=list)
+    assets: list[dict] = field(default_factory=list)   # delivered (post-guard)
+    claims: list[dict] = field(default_factory=list)    # delivered (post-guard)
     valid_source_ids: set[str] = field(default_factory=set)
     tool_calls: int = 0
     claims_dropped: int = 0
+    raw_assets: list[dict] = field(default_factory=list)   # pre-guard (for grounding metrics)
+    raw_claims: list[dict] = field(default_factory=list)
     mode: str = "replay"
 
 
@@ -105,24 +107,34 @@ def load_gold(gold_dir: str | None = None) -> list[dict]:
 
 
 def _load_fixture(query_id: str, fixtures_dir: str | None) -> dict:
-    if fixtures_dir:
-        return json.loads((Path(fixtures_dir) / f"{query_id}.json").read_text(encoding="utf-8"))
-    text = importlib.resources.files("assetscope.evals.fixtures").joinpath(
-        f"{query_id}.json"
-    ).read_text(encoding="utf-8")
-    return json.loads(text)
+    try:
+        if fixtures_dir:
+            return json.loads((Path(fixtures_dir) / f"{query_id}.json").read_text(encoding="utf-8"))
+        text = importlib.resources.files("assetscope.evals.fixtures").joinpath(
+            f"{query_id}.json"
+        ).read_text(encoding="utf-8")
+        return json.loads(text)
+    except (FileNotFoundError, OSError) as exc:
+        raise RuntimeError(
+            f"No replay fixture for gold id {query_id!r} under "
+            f"{fixtures_dir or 'the packaged fixtures'}."
+        ) from exc
 
 
 # -- run modes -------------------------------------------------------------
 def _replay_run(gold: dict, fixtures_dir: str | None) -> EvalRun:
     fx = _load_fixture(gold["id"], fixtures_dir)
+    # valid_ids = the agent's full retrieval ledger (the universe). Raw claims
+    # citing ids outside this set are correctly ungrounded for the metrics.
     valid_ids = set(fx.get("valid_source_ids", []))
     tool_calls = int(fx.get("tool_calls", 0))
     cleaned, dropped = _guard_submission(gold["query"], fx, valid_ids, tool_calls)
-    assets, claims, valid = _landscape_to_pred(cleaned)
+    assets, claims, _ = _landscape_to_pred(cleaned)
     return EvalRun(
         query_id=gold["id"], query=gold["query"], assets=assets, claims=claims,
-        valid_source_ids=valid, tool_calls=tool_calls, claims_dropped=dropped, mode="replay",
+        valid_source_ids=valid_ids, tool_calls=tool_calls, claims_dropped=dropped,
+        raw_assets=fx.get("assets", []), raw_claims=fx.get("narrative_claims", []),
+        mode="replay",
     )
 
 
@@ -131,6 +143,8 @@ def _live_run(gold: dict) -> EvalRun:
 
     landscape = AssetScopeAgent().run_to_completion(gold["query"])
     assets, claims, valid = _landscape_to_pred(landscape)
+    # The raw pre-guard submission isn't recoverable from the Landscape, so
+    # grounding is scored on the delivered claims + the guard's dropped count.
     return EvalRun(
         query_id=gold["id"], query=gold["query"], assets=assets, claims=claims,
         valid_source_ids=valid, tool_calls=landscape.tool_calls,
@@ -156,6 +170,9 @@ def run_suite(
                 claims=run.claims,
                 valid_source_ids=run.valid_source_ids,
                 tool_calls=run.tool_calls,
+                grounding_assets=run.raw_assets or None,
+                grounding_claims=run.raw_claims or None,
+                dropped_claims=(0 if run.raw_claims else run.claims_dropped),
             )
         )
     return {"mode": mode, "scores": scores, "runs": runs, "aggregate": aggregate(scores)}

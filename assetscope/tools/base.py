@@ -73,6 +73,7 @@ def build_default_registry(retriever: Any | None = None) -> ToolRegistry:
     # Imported here to avoid a circular import at module load time.
     from assetscope.tools.chembl import ChemblTool
     from assetscope.tools.clinical_trials import ClinicalTrialsTool
+    from assetscope.tools.fda import FdaTool
     from assetscope.tools.literature import LiteratureTool
     from assetscope.tools.open_targets import OpenTargetsTool
     from assetscope.tools.retrieve import RetrieveTool
@@ -83,6 +84,7 @@ def build_default_registry(retriever: Any | None = None) -> ToolRegistry:
             OpenTargetsTool(),
             ChemblTool(),
             LiteratureTool(),
+            FdaTool(),
             RetrieveTool(retriever=retriever),
         ]
     )

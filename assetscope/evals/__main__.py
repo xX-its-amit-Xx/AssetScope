@@ -45,7 +45,8 @@ HEADERS = ["query", "fact_P", "fact_R", "cite_cov", "halluc", "assets", "tools",
 
 
 def _render_table(headers: list[str], rows: list[list[str]]) -> str:
-    widths = [max(len(headers[i]), *(len(r[i]) for r in rows)) for i in range(len(headers))]
+    # Wrap the args in a list so max() has one iterable even when rows is empty.
+    widths = [max([len(headers[i]), *(len(r[i]) for r in rows)]) for i in range(len(headers))]
     def line(cells):
         return "| " + " | ".join(c.ljust(widths[i]) for i, c in enumerate(cells)) + " |"
     sep = "|" + "|".join("-" * (w + 2) for w in widths) + "|"
@@ -102,6 +103,11 @@ def cmd_run(args: argparse.Namespace) -> int:
     else:
         mode = "replay"
     result = run_suite(mode=mode, gold_dir=args.gold_dir, fixtures_dir=args.fixtures_dir)
+
+    if not result["scores"]:
+        src = args.gold_dir or "the bundled gold set"
+        print(f"\nNo gold queries found in {src}. Nothing to score.")
+        return 2
 
     rows = _scorecard_rows(result["scores"], result["runs"])
     print(f"\nAssetScope eval scorecard  (mode={mode})\n")

@@ -84,9 +84,15 @@ class ClinicalTrialsTool(Tool):
         status: str | None = None,
         max_results: int = 10,
     ) -> ToolResult:
+        max_results = min(max(max_results, 1), 50)
+        wanted_phase = _PHASE_NORMALIZE.get((phase or "").upper().strip()) if phase else None
+        # Phase is filtered client-side (the v2 API phase facet is unreliable),
+        # so when a phase is requested we scan a larger pool — otherwise we'd
+        # return 0-2 hits just because the top page happened to be other phases.
+        page_size = min(200, max(max_results * 8, 50)) if wanted_phase else max_results
         params: dict[str, Any] = {
             "query.term": query,
-            "pageSize": min(max(max_results, 1), 50),
+            "pageSize": page_size,
             "countTotal": "true",
         }
         if status:
@@ -94,7 +100,6 @@ class ClinicalTrialsTool(Tool):
 
         data = get_json(API_URL, params=params)
         studies = data.get("studies", [])
-        wanted_phase = _PHASE_NORMALIZE.get((phase or "").upper().strip()) if phase else None
 
         items: list[EvidenceItem] = []
         for study in studies:
@@ -144,11 +149,21 @@ class ClinicalTrialsTool(Tool):
                     },
                 )
             )
+            if len(items) >= max_results:
+                break
 
-        total = data.get("totalCount", len(items))
+        total = data.get("totalCount")
+        if wanted_phase:
+            summary = (
+                f"{len(items)} {wanted_phase} trial(s) for '{query}' "
+                f"(scanned {len(studies)} top text matches)."
+            )
+        else:
+            extra = f" (~{total} total text matches)" if total is not None else ""
+            summary = f"{len(items)} trial(s) for '{query}'{extra}."
         return ToolResult(
             tool=self.name,
             args={"query": query, "phase": phase, "status": status, "max_results": max_results},
             items=items,
-            summary=f"{len(items)} trial(s) returned (matched {total} total) for '{query}'.",
+            summary=summary,
         )

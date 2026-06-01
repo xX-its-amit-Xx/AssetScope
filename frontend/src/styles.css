@@ -91,6 +91,23 @@ a:hover { text-decoration: underline; }
   color: var(--muted);
   margin: 0 0 10px;
 }
+.section-head { display: flex; align-items: center; justify-content: space-between; }
+.export { display: flex; gap: 8px; margin-bottom: 10px; }
+.export button {
+  background: var(--chip);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 5px 11px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.export button:hover { border-color: var(--accent); color: var(--accent); }
+.searchbar button.stop {
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
 
 .card {
   background: var(--panel);
@@ -188,6 +205,7 @@ table.landscape td.asset { font-weight: 700; }
 .cite.pubmed { color: #ffa657; }
 .cite.chembl { color: #d2a8ff; }
 .cite.open_targets { color: #79c0ff; }
+.cite.fda { color: #ff9bce; }
 .cite:hover { border-color: currentColor; }
 
 /* Narrative */

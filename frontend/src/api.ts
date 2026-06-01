@@ -37,11 +37,13 @@ export async function* streamQuery(
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
 
-    let idx: number;
-    // Split on blank line (handles \n\n and \r\n\r\n).
-    while ((idx = buffer.search(/\r?\n\r?\n/)) !== -1) {
-      const block = buffer.slice(0, idx);
-      buffer = buffer.slice(idx + (buffer[idx] === "\r" ? 4 : 2));
+    // Split on a blank line; use the actual matched separator length (handles
+    // \n\n, \r\n\r\n and mixed forms) instead of guessing it.
+    const sep = /\r?\n\r?\n/;
+    let m: RegExpExecArray | null;
+    while ((m = sep.exec(buffer)) !== null) {
+      const block = buffer.slice(0, m.index);
+      buffer = buffer.slice(m.index + m[0].length);
       const dataLines = block
         .split(/\r?\n/)
         .filter((l) => l.startsWith("data:"))

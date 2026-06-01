@@ -114,5 +114,6 @@ def test_loop_runs_tools_and_guards():
 def test_guard_event_reports_coverage():
     agent = _agent()
     guard_ev = next(e for e in agent.run("q") if e.type == EventType.GUARD)
-    assert guard_ev.data["citation_coverage"] == 1.0
+    # 1 of 2 submitted claims grounded (the other dropped) -> coverage 0.5
+    assert guard_ev.data["citation_coverage"] == 0.5
     assert guard_ev.data["dropped_claims"] == 1

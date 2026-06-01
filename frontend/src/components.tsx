@@ -1,4 +1,5 @@
 import type { Asset, Citation, Claim, GuardReport, Landscape } from "./types";
+import { exportCSV, exportMarkdown } from "./exporters";
 
 type CiteIndex = Record<string, Citation>;
 
@@ -15,7 +16,7 @@ export function CiteChips({ ids, idx }: { ids: string[]; idx: CiteIndex }) {
       {ids.map((id) => {
         const c = idx[id];
         const cls = c ? c.source_type : "";
-        const label = id.replace(/^OT:/, "");
+        const label = id.replace(/^(OT:|SPL:|FDALABEL:)/, "");
         return c?.url ? (
           <a
             key={id}
@@ -99,7 +100,7 @@ function pct(x: number) {
 
 export function GuardBar({ guard, toolCalls }: { guard: GuardReport; toolCalls: number }) {
   const covClass = guard.citation_coverage >= 0.99 ? "good" : "warn";
-  const halClass = guard.dropped_claims + guard.unverified_claims === 0 ? "good" : "warn";
+  const dropClass = guard.dropped_claims === 0 ? "good" : "warn";
   return (
     <div className="section">
       <h2>Reliability guard</h2>
@@ -113,7 +114,7 @@ export function GuardBar({ guard, toolCalls }: { guard: GuardReport; toolCalls: 
           <span className="k">supported claims</span>
         </div>
         <div className="metric">
-          <span className={`v ${halClass}`}>{guard.dropped_claims}</span>
+          <span className={`v ${dropClass}`}>{guard.dropped_claims}</span>
           <span className="k">claims dropped</span>
         </div>
         <div className="metric">
@@ -133,7 +134,13 @@ export function LandscapeTable({ landscape, idx }: { landscape: Landscape; idx: 
   const cols = ["Asset", "Company", "Target", "Mechanism", "Indication", "Phase", "Latest readout", "Sources"];
   return (
     <div className="section">
-      <h2>Competitive landscape ({landscape.assets.length} assets)</h2>
+      <div className="section-head">
+        <h2>Competitive landscape ({landscape.assets.length} assets)</h2>
+        <div className="export">
+          <button onClick={() => exportCSV(landscape)} title="Download as CSV (opens in Excel)">⬇ CSV</button>
+          <button onClick={() => exportMarkdown(landscape)} title="Download as Markdown">⬇ Markdown</button>
+        </div>
+      </div>
       <div className="table-wrap">
         <table className="landscape">
           <thead>

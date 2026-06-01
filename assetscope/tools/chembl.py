@@ -85,7 +85,7 @@ class ChemblTool(Tool):
             )
             content = (
                 f"ChEMBL {chembl_id}: {pref}\n"
-                f"Max clinical phase: {_MAX_PHASE_LABEL.get(max_phase_int, max_phase)}\n"
+                f"Max clinical phase: {_MAX_PHASE_LABEL.get(max_phase_int, 'Unknown')}\n"
                 f"Mechanism(s): {mech_str or 'not annotated in ChEMBL'}"
             )
             items.append(

@@ -29,9 +29,10 @@ class GuardReport:
 
     @property
     def citation_coverage(self) -> float:
-        """Fraction of (kept) claims that have >= 1 valid source."""
-        kept = self.supported_claims + self.unverified_claims
-        denom = kept if kept else self.total_claims
+        """Fraction of ALL submitted claims that ended up grounded by >= 1 valid
+        source. Dropped claims count against coverage (so dropping half a
+        landscape shows ~50%, not a misleading 100%)."""
+        denom = self.total_claims
         return (self.supported_claims / denom) if denom else 1.0
 
 
@@ -86,10 +87,11 @@ class ReliabilityGuard:
 
         # Asset rows: keep, but flag any whose sources don't resolve.
         cleaned_assets = []
-        for asset in landscape.assets:
+        for idx, asset in enumerate(landscape.assets):
             ok, missing = ledger.resolve(asset.source_ids)
             for cid in ok:
-                ledger.note_reference(cid, f"asset:{asset.asset_name}")
+                # Key by index so two rows sharing a name don't collide.
+                ledger.note_reference(cid, f"asset:{idx}:{asset.asset_name}")
             verified = bool(ok)
             if not verified:
                 report.flagged_assets += 1

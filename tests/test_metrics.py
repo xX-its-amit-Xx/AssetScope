@@ -93,8 +93,21 @@ def test_contradiction_detected():
     assert s.factual_precision < 1.0
 
 
-def test_aggregate_keys():
+def test_hallucination_rate_bounded():
+    # A single asset that is BOTH ungrounded AND contradictory must count once,
+    # so hallucination_rate stays within [0, 1] (regression: it could hit 2.0).
+    assets = [{"asset_name": "DrugA", "company": "Acme",
+               "mechanism": "reversible inhibitor", "source_ids": ["MADEUP"]}]
+    s = score_query(GOLD, assets=assets, claims=[], valid_source_ids=set(), tool_calls=1)
+    assert s.details["contradiction_hits"] >= 1
+    assert s.hallucination_rate == 1.0
+
+
+def test_aggregate_keys_empty_safe():
+    # aggregate([]) must return all keys (default 0.0) so the CLI never KeyErrors.
+    agg = aggregate([])
+    for k in ["factual_precision", "factual_recall", "citation_coverage",
+              "hallucination_rate", "avg_tool_calls", "avg_calls_per_asset"]:
+        assert agg[k] == 0.0
     s = score_query(GOLD, assets=[], claims=[], valid_source_ids=set(), tool_calls=0)
-    agg = aggregate([s])
-    for k in ["factual_precision", "factual_recall", "citation_coverage", "hallucination_rate"]:
-        assert k in agg
+    assert "factual_precision" in aggregate([s])

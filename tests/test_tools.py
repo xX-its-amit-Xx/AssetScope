@@ -132,11 +132,41 @@ def test_registry_dispatch_errors():
     assert "kaboom" in reg.dispatch("boom", {}).error
 
 
-def test_default_registry_has_five_tools():
+@respx.mock
+def test_fda_tool_drugsfda_and_label():
+    from assetscope.tools.fda import FdaTool
+
+    drugsfda = {"results": [{
+        "application_number": "NDA214665", "sponsor_name": "AMGEN INC",
+        "products": [{"brand_name": "LUMAKRAS", "marketing_status": "Prescription",
+                      "active_ingredients": [{"name": "SOTORASIB"}]}],
+        "openfda": {"brand_name": ["LUMAKRAS"], "generic_name": ["SOTORASIB"],
+                    "pharm_class_epc": ["Kinase Inhibitor [EPC]"]},
+    }]}
+    label = {"results": [{
+        "indications_and_usage": ["LUMAKRAS is indicated for KRAS G12C-mutated NSCLC."],
+        "mechanism_of_action": ["Sotorasib is a KRAS G12C inhibitor."],
+        "openfda": {"brand_name": ["LUMAKRAS"], "spl_set_id": ["abc-123"]},
+    }]}
+
+    def handler(request):
+        body = label if "/drug/label.json" in str(request.url) else drugsfda
+        return httpx.Response(200, json=body)
+
+    respx.route(method="GET", host="api.fda.gov").mock(side_effect=handler)
+    res = FdaTool().run(drug="sotorasib")
+    ids = [it.citation.id for it in res.items]
+    assert "NDA214665" in ids
+    assert any(i.startswith("SPL:") for i in ids)
+    blob = " ".join(it.content for it in res.items)
+    assert "AMGEN" in blob and "KRAS G12C" in blob
+
+
+def test_default_registry_has_six_tools():
     reg = build_default_registry()
     assert set(reg.names()) == {
         "search_clinical_trials", "search_open_targets", "search_chembl",
-        "search_literature", "retrieve",
+        "search_literature", "search_fda", "retrieve",
     }
     # every schema is Anthropic-tool shaped
     for s in reg.anthropic_schemas():

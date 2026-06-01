@@ -38,6 +38,7 @@ class RetrievedChunk:
     content: str
     score: float
     modality: str  # "vector" | "keyword"
+    chunk_index: int = 0
 
 
 def _vec_literal(vec: list[float]) -> str:
@@ -70,14 +71,21 @@ class VectorStore:
         return importlib.resources.files("assetscope.db").joinpath("schema.sql").read_text()
 
     def ensure_schema(self) -> None:
+        sql = self.schema_sql()
+        # Keep the embedding column width in sync with the configured dim.
+        dim = get_settings().embedding_dim
+        if dim != 384:
+            sql = sql.replace("vector(384)", f"vector({dim})")
         with self._conn.cursor() as cur:
-            cur.execute(self.schema_sql())
+            cur.execute(sql)
 
     def upsert_chunks(self, records: list[ChunkRecord]) -> int:
         if not records:
             return 0
         n = 0
-        with self._conn.cursor() as cur:
+        # All-or-nothing batch: a bad row rolls back the whole ingest so the
+        # returned count always matches what actually persisted.
+        with self._conn.transaction(), self._conn.cursor() as cur:
             for rec in records:
                 c = rec.citation
                 cur.execute(
@@ -108,7 +116,7 @@ class VectorStore:
 
     def _rows_to_hits(self, rows, modality: str) -> list[RetrievedChunk]:
         hits = []
-        for source_type, source_id, citation_id, title, url, content, score in rows:
+        for source_type, source_id, citation_id, title, url, chunk_index, content, score in rows:
             hits.append(
                 RetrievedChunk(
                     citation=Citation(
@@ -122,6 +130,7 @@ class VectorStore:
                     content=content,
                     score=float(score),
                     modality=modality,
+                    chunk_index=int(chunk_index),
                 )
             )
         return hits
@@ -131,7 +140,7 @@ class VectorStore:
             cur.execute(
                 """
                 SELECT d.source_type, d.source_id, d.citation_id, d.title, d.url,
-                       c.content, 1 - (c.embedding <=> %s::vector) AS score
+                       c.chunk_index, c.content, 1 - (c.embedding <=> %s::vector) AS score
                 FROM chunks c JOIN documents d ON d.id = c.document_id
                 WHERE c.embedding IS NOT NULL
                 ORDER BY c.embedding <=> %s::vector
@@ -146,7 +155,8 @@ class VectorStore:
             cur.execute(
                 """
                 SELECT d.source_type, d.source_id, d.citation_id, d.title, d.url,
-                       c.content, ts_rank(c.tsv, websearch_to_tsquery('english', %s)) AS score
+                       c.chunk_index, c.content,
+                       ts_rank(c.tsv, websearch_to_tsquery('english', %s)) AS score
                 FROM chunks c JOIN documents d ON d.id = c.document_id
                 WHERE c.tsv @@ websearch_to_tsquery('english', %s)
                 ORDER BY score DESC
@@ -169,58 +179,64 @@ class InMemoryStore:
     backend = "in-memory"
 
     def __init__(self) -> None:
-        self._records: list[ChunkRecord] = []
-        self._seen: set[tuple[str, int]] = set()
+        # keyed by (source_key, chunk_index); overwrite on conflict to mirror
+        # the Postgres ON CONFLICT DO UPDATE semantics.
+        self._records: dict[tuple[str, int], ChunkRecord] = {}
 
     def upsert_chunks(self, records: list[ChunkRecord]) -> int:
         n = 0
         for rec in records:
             key = (f"{rec.citation.source_type.value}:{rec.citation.source_id}", rec.chunk_index)
-            if key in self._seen:
-                continue
-            self._seen.add(key)
-            self._records.append(rec)
+            self._records[key] = rec  # overwrite
             n += 1
         return n
 
     def vector_search(self, query_embedding: list[float], k: int) -> list[RetrievedChunk]:
         import numpy as np
 
-        if not self._records:
+        if not query_embedding:
+            return []
+        dim = len(query_embedding)
+        # Only consider records whose embedding matches the query dimensionality
+        # (guards against ragged/empty embeddings crashing the fallback path).
+        recs = [r for r in self._records.values() if r.embedding and len(r.embedding) == dim]
+        if not recs:
             return []
         q = np.asarray(query_embedding, dtype=float)
-        mat = np.asarray([r.embedding for r in self._records], dtype=float)
-        # embeddings are L2-normalized; guard query norm anyway.
+        mat = np.asarray([r.embedding for r in recs], dtype=float)
         qn = q / (np.linalg.norm(q) or 1.0)
         sims = mat @ qn
         order = np.argsort(-sims)[:k]
         return [
             RetrievedChunk(
-                citation=self._records[i].citation,
-                content=self._records[i].content,
+                citation=recs[i].citation,
+                content=recs[i].content,
                 score=float(sims[i]),
                 modality="vector",
+                chunk_index=recs[i].chunk_index,
             )
             for i in order
         ]
 
     def keyword_search(self, query: str, k: int) -> list[RetrievedChunk]:
-        if not self._records:
+        recs = list(self._records.values())
+        if not recs:
             return []
         try:
             from rank_bm25 import BM25Okapi
         except Exception:  # pragma: no cover
             return []
-        corpus = [r.content.lower().split() for r in self._records]
+        corpus = [r.content.lower().split() for r in recs]
         bm25 = BM25Okapi(corpus)
         scores = bm25.get_scores(query.lower().split())
         ranked = sorted(range(len(scores)), key=lambda i: -scores[i])[:k]
         return [
             RetrievedChunk(
-                citation=self._records[i].citation,
-                content=self._records[i].content,
+                citation=recs[i].citation,
+                content=recs[i].content,
                 score=float(scores[i]),
                 modality="keyword",
+                chunk_index=recs[i].chunk_index,
             )
             for i in ranked
             if scores[i] > 0

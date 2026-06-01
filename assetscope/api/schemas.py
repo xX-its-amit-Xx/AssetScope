@@ -20,8 +20,10 @@ class ToolInfo(BaseModel):
 class HealthResponse(BaseModel):
     status: str
     version: str
+    backend: str            # "anthropic" | "local"/"openai"
+    model: str              # the model the active backend will actually use
+    llm_configured: bool    # is the active backend usable (key / base_url set)?
     anthropic_configured: bool
-    model: str
 
 
 class QueryResponse(BaseModel):

@@ -39,7 +39,13 @@ def _norm(s: str) -> str:
 def _contains(text_norm: str, term: str) -> bool:
     """Token-boundary containment: 'reversible' must NOT match inside
     'irreversible'. Works for multi-word terms because the normalized text is a
-    space-separated run of [a-z0-9] tokens."""
+    space-separated run of [a-z0-9] tokens.
+
+    NOTE: hyphens are treated as token boundaries (``non-covalent`` -> tokens
+    ``non`` ``covalent``), so a bare ``covalent`` term WILL match inside
+    ``non-covalent``. Author gold/contradiction terms accordingly (e.g. use the
+    distinctive token, or a multi-word phrase, not a substring that also appears
+    in its negation)."""
     t = _norm(term)
     if not t:
         return False
@@ -74,6 +80,26 @@ class QueryScore:
     details: dict[str, Any] = field(default_factory=dict)
 
 
+def _norm_units(assets: list[dict], claims: list[dict], valid: set[str]):
+    """Normalize an (assets, claims) prediction into text + grounded flags, used
+    for citation-coverage / hallucination scoring."""
+    rows = [
+        {
+            "text_norm": _norm(" ".join(str(a.get(k, "")) for k in ["asset_name", *FIELDS])),
+            "grounded": any(s in valid for s in (a.get("source_ids") or [])),
+        }
+        for a in assets
+    ]
+    cl = [
+        {
+            "text_norm": _norm(c.get("text", "")),
+            "grounded": any(s in valid for s in (c.get("source_ids") or [])),
+        }
+        for c in claims
+    ]
+    return rows, cl
+
+
 def score_query(
     gold: dict,
     *,
@@ -81,11 +107,20 @@ def score_query(
     claims: list[dict],
     valid_source_ids: set[str],
     tool_calls: int,
+    grounding_assets: list[dict] | None = None,
+    grounding_claims: list[dict] | None = None,
+    dropped_claims: int = 0,
 ) -> QueryScore:
-    """Score one query. ``assets``/``claims`` are the prediction; each asset is a
-    dict with the landscape fields + ``source_ids``; each claim is
-    ``{text, source_ids}``. ``valid_source_ids`` is the universe of ids the agent
-    actually retrieved (its citation ledger)."""
+    """Score one query.
+
+    ``assets``/``claims`` are the *delivered* (post-guard) prediction, scored for
+    factual recall/precision/asset-recall. ``grounding_assets``/``grounding_claims``
+    are what the agent *submitted before* the reliability guard ran — used for
+    citation_coverage / hallucination so the harness can detect ungrounded claims
+    the guard caught (or missed). If omitted they default to the delivered set.
+    ``dropped_claims`` (live mode, where the raw submission isn't available) folds
+    guard-dropped claims into coverage/hallucination as ungrounded units.
+    ``valid_source_ids`` is the universe of ids the agent actually retrieved."""
 
     gold_assets = gold.get("assets", [])
     contradictions = gold.get("contradictions", [])
@@ -185,18 +220,31 @@ def score_query(
     score.false_positives = fp
     score.factual_precision = tp / (tp + fp) if (tp + fp) else 1.0
 
-    # --- citation coverage + hallucination --------------------------------
-    n_claims = len(norm_claims)
-    grounded_claims = sum(1 for c in norm_claims if c["grounded"])
-    score.n_claims = n_claims
-    score.grounded_claims = grounded_claims
-    score.citation_coverage = grounded_claims / n_claims if n_claims else 1.0
+    # --- citation coverage + hallucination (over the PRE-guard agent output) ---
+    g_assets = grounding_assets if grounding_assets is not None else assets
+    g_claims = grounding_claims if grounding_claims is not None else claims
+    grow, gcl = _norm_units(g_assets, g_claims, valid_source_ids)
 
-    units = n_claims + len(norm_rows)
-    ungrounded = sum(1 for c in norm_claims if not c["grounded"]) + sum(
-        1 for r in norm_rows if not r["grounded"]
-    )
-    score.hallucination_rate = (ungrounded + contradiction_hits) / units if units else 0.0
+    # Coverage = grounded claims / ALL submitted claims (incl. guard-dropped ones).
+    grounded_claims = sum(1 for c in gcl if c["grounded"])
+    total_claims = len(gcl) + dropped_claims
+    score.n_claims = total_claims
+    score.grounded_claims = grounded_claims
+    score.citation_coverage = grounded_claims / total_claims if total_claims else 1.0
+
+    # Hallucination = fraction of units that are bad, counting each unit ONCE
+    # (ungrounded OR contradicted), plus guard-dropped claims as bad units.
+    bad = 0
+    for u in gcl + grow:
+        contradicted = any(
+            terms and all(_contains(u["text_norm"], t) for t in terms)
+            for terms in [c.get("terms", []) for c in contradictions]
+        )
+        if (not u["grounded"]) or contradicted:
+            bad += 1
+    bad += dropped_claims
+    units = len(gcl) + len(grow) + dropped_claims
+    score.hallucination_rate = bad / units if units else 0.0
 
     # --- tool efficiency --------------------------------------------------
     score.tool_calls = tool_calls
@@ -209,10 +257,16 @@ def score_query(
     return score
 
 
+_AGG_KEYS = [
+    "factual_precision", "factual_recall", "grounded_recall", "asset_recall",
+    "citation_coverage", "hallucination_rate", "avg_tool_calls", "avg_calls_per_asset",
+]
+
+
 def aggregate(scores: list[QueryScore]) -> dict[str, float]:
     """Macro-average the headline metrics across queries."""
     if not scores:
-        return {}
+        return {k: 0.0 for k in _AGG_KEYS}
     n = len(scores)
 
     def avg(attr: str) -> float:

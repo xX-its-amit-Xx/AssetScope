@@ -121,7 +121,9 @@ class OpenTargetsTool(Tool):
                     content=header
                     + "\nTop associated diseases:\n"
                     + "\n".join(
-                        f"- {r['disease']['name']} (score {r['score']:.3f})" for r in rows
+                        f"- {(r.get('disease') or {}).get('name')} (score {(r.get('score') or 0.0):.3f})"
+                        for r in rows
+                        if (r.get("disease") or {}).get("name")
                     ),
                     fields={"symbol": symbol, "ensembl_id": ent_id, "tractability": tract},
                 )
@@ -144,7 +146,9 @@ class OpenTargetsTool(Tool):
                     content=f"Open Targets disease {disease.get('name', ent_name)} ({ent_id})\n"
                     + "Top associated targets:\n"
                     + "\n".join(
-                        f"- {r['target']['approvedSymbol']} (score {r['score']:.3f})" for r in rows
+                        f"- {(r.get('target') or {}).get('approvedSymbol')} (score {(r.get('score') or 0.0):.3f})"
+                        for r in rows
+                        if (r.get("target") or {}).get("approvedSymbol")
                     ),
                     fields={"efo_id": ent_id, "name": disease.get("name", ent_name)},
                 )

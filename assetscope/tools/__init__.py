@@ -9,6 +9,7 @@ and never imports individual tools directly.
 from assetscope.tools.base import Tool, ToolRegistry, build_default_registry
 from assetscope.tools.chembl import ChemblTool
 from assetscope.tools.clinical_trials import ClinicalTrialsTool
+from assetscope.tools.fda import FdaTool
 from assetscope.tools.literature import LiteratureTool
 from assetscope.tools.open_targets import OpenTargetsTool
 from assetscope.tools.retrieve import RetrieveTool
@@ -21,5 +22,6 @@ __all__ = [
     "OpenTargetsTool",
     "ChemblTool",
     "LiteratureTool",
+    "FdaTool",
     "RetrieveTool",
 ]

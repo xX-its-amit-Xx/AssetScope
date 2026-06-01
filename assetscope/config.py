@@ -57,15 +57,23 @@ class Settings(BaseSettings):
     # --- External APIs -----------------------------------------------------
     contact_email: str = "assetscope@example.com"
     pubmed_api_key: str = ""
+    fda_api_key: str = ""  # optional openFDA key (raises rate limits)
     http_timeout: float = 30.0
 
     # --- Server ------------------------------------------------------------
     log_level: str = "INFO"
     cors_origins: str = "http://localhost:5173,http://localhost:4173"
+    # Comma-separated API keys. Empty => auth disabled (open; fine for localhost).
+    # When set, /query and /query/stream require a matching X-API-Key header.
+    api_keys: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def api_key_set(self) -> set[str]:
+        return {k.strip() for k in self.api_keys.split(",") if k.strip()}
 
     @property
     def has_anthropic(self) -> bool:
