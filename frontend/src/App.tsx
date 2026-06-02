@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { listLandscapes, loadLandscape, streamQuery } from "./api";
+import { diffLandscape, listLandscapes, loadLandscape, streamQuery } from "./api";
 import {
   buildCiteIndex,
+  DiffView,
   GuardBar,
   LandscapeTable,
   Narrative,
@@ -9,7 +10,7 @@ import {
   ToolTrace,
   type TraceEntry,
 } from "./components";
-import type { GuardReport, Landscape, LandscapeSummary } from "./types";
+import type { GuardReport, Landscape, LandscapeDiff, LandscapeSummary } from "./types";
 
 const EXAMPLES = [
   "competitive landscape for oral GLP-1 agonists in obesity",
@@ -27,6 +28,7 @@ export function App() {
   const [landscape, setLandscape] = useState<Landscape | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<LandscapeSummary[]>([]);
+  const [diff, setDiff] = useState<LandscapeDiff | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   function refreshHistory() {
@@ -46,7 +48,20 @@ export function App() {
     }
   }
 
+  async function showDiff(id: string) {
+    if (running) return;
+    setDiff(null);
+    try {
+      const d = await diffLandscape(id);
+      if (d) setDiff(d);
+      else setStatus("No prior run of this query to diff against.");
+    } catch (e: any) {
+      setError(String(e?.message ?? e));
+    }
+  }
+
   function reset() {
+    setDiff(null);
     setPlan([]);
     setTrace([]);
     setGuard(null);
@@ -160,16 +175,25 @@ export function App() {
           <h2>History ({history.length})</h2>
           <div className="card">
             {history.slice(0, 12).map((h) => (
-              <button
-                key={h.id}
-                className="history-item"
-                onClick={() => openSaved(h.id)}
-                disabled={running}
-                title={`${new Date(h.created_at).toLocaleString()} · open without re-running`}
-              >
-                <span className="hq">{h.query}</span>
-                <span className="hm">{h.n_assets} assets · {h.tool_calls} calls</span>
-              </button>
+              <div key={h.id} className="history-item">
+                <button
+                  className="history-open"
+                  onClick={() => openSaved(h.id)}
+                  disabled={running}
+                  title={`${new Date(h.created_at).toLocaleString()} · open without re-running`}
+                >
+                  <span className="hq">{h.query}</span>
+                  <span className="hm">{h.n_assets} assets · {h.tool_calls} calls</span>
+                </button>
+                <button
+                  className="history-diff"
+                  onClick={() => showDiff(h.id)}
+                  disabled={running}
+                  title="Diff vs the previous run of this query"
+                >
+                  Δ
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -186,6 +210,7 @@ export function App() {
       <PlanTrace plan={plan} />
       <ToolTrace entries={trace} />
       {/* On a backend error, suppress the (empty) guard/landscape panels. */}
+      {diff && !error && <DiffView diff={diff} />}
       {guard && !error && <GuardBar guard={guard} toolCalls={landscape?.tool_calls ?? 0} />}
       {!error && landscape && landscape.assets.length > 0 && (
         <>

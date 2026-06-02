@@ -1,4 +1,4 @@
-import type { AgentEvent, Landscape, LandscapeSummary } from "./types";
+import type { AgentEvent, Landscape, LandscapeDiff, LandscapeSummary } from "./types";
 
 export const API_BASE: string =
   (import.meta as any).env?.VITE_API_BASE ?? "http://localhost:8000";
@@ -19,6 +19,13 @@ export async function loadLandscape(id: string): Promise<Landscape> {
   const r = await fetch(`${API_BASE}/landscapes/${id}`);
   if (!r.ok) throw new Error(`load ${r.status}`);
   return (await r.json()).landscape as Landscape;
+}
+
+export async function diffLandscape(id: string): Promise<LandscapeDiff | null> {
+  const r = await fetch(`${API_BASE}/landscapes/${id}/diff`);
+  if (r.status === 404) return null; // no prior run of this query
+  if (!r.ok) throw new Error(`diff ${r.status}`);
+  return r.json();
 }
 
 /**

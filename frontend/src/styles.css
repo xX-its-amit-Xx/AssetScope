@@ -125,6 +125,20 @@ a:hover { text-decoration: underline; }
 .history-item:hover { border-color: var(--accent); }
 .history-item .hq { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .history-item .hm { color: var(--muted); font-size: 11px; white-space: nowrap; }
+.history-open {
+  flex: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  background: transparent; border: none; color: var(--text); cursor: pointer; text-align: left; padding: 0;
+  overflow: hidden;
+}
+.history-diff {
+  background: var(--chip); border: 1px solid var(--border); color: var(--accent);
+  border-radius: 6px; padding: 2px 9px; cursor: pointer; font-size: 13px;
+}
+.history-diff:hover { border-color: var(--accent); }
+.diffview { display: flex; flex-direction: column; gap: 5px; font-size: 13px; line-height: 1.5; }
+.diff-add { color: var(--accent-2); }
+.diff-rem { color: var(--danger); }
+.diff-chg { color: var(--warn); }
 
 .card {
   background: var(--panel);

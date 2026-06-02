@@ -38,3 +38,16 @@ class LandscapeSummary(BaseModel):
     n_assets: int
     tool_calls: int
     dropped_claims: int
+
+
+class DiffResponse(BaseModel):
+    query: str
+    new_id: str
+    old_id: str
+    added: list[dict]
+    removed: list[dict]
+    changed: list[dict]
+    n_added: int
+    n_removed: int
+    n_changed: int
+    unchanged: int

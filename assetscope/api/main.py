@@ -21,6 +21,7 @@ from assetscope.agent import AgentEvent, AssetScopeAgent
 from assetscope.agent.events import EventType
 from assetscope.agent.loop import AgentError
 from assetscope.api.schemas import (
+    DiffResponse,
     HealthResponse,
     LandscapeSummary,
     QueryRequest,
@@ -28,6 +29,7 @@ from assetscope.api.schemas import (
     ToolInfo,
 )
 from assetscope.config import get_settings
+from assetscope.diff import diff_landscapes
 from assetscope.models import Landscape
 from assetscope.storage import get_landscape_store
 from assetscope.tools import build_default_registry
@@ -128,6 +130,25 @@ def get_landscape(landscape_id: str) -> QueryResponse:
     if data is None:
         raise HTTPException(status_code=404, detail="Landscape not found.")
     return QueryResponse(landscape=Landscape.model_validate(data), id=landscape_id)
+
+
+@app.get("/landscapes/{landscape_id}/diff", response_model=DiffResponse)
+def diff_landscape(landscape_id: str, against: str | None = None) -> DiffResponse:
+    """Diff a saved landscape against a prior run (auto-picks the previous run of
+    the same query if ``against`` is omitted): added / removed / changed assets."""
+    store = get_landscape_store()
+    new_data = store.get(landscape_id)
+    if new_data is None:
+        raise HTTPException(status_code=404, detail="Landscape not found.")
+    new_ls = Landscape.model_validate(new_data)
+    old_id = against or store.find_prior(new_ls.query, landscape_id)
+    if not old_id:
+        raise HTTPException(status_code=404, detail="No prior landscape of this query to diff against.")
+    old_data = store.get(old_id)
+    if old_data is None:
+        raise HTTPException(status_code=404, detail="Comparison landscape not found.")
+    d = diff_landscapes(Landscape.model_validate(old_data), new_ls)
+    return DiffResponse(new_id=landscape_id, old_id=old_id, **d)
 
 
 @app.post("/query/stream", dependencies=[Depends(require_api_key)])

@@ -273,25 +273,28 @@ cd frontend && npm install && npm run dev   # http://localhost:5173
   per asset with source IDs *and* source URLs) and **Markdown** (table + cited
   narrative + disclaimer) export — analysts can drop findings straight into a
   spreadsheet or doc with citations intact.
+- **History library.** Every run is persisted (Postgres jsonb, in-memory
+  fallback). `GET /landscapes` lists past runs and the UI **History** panel
+  re-opens any of them without re-running the agent (`GET /landscapes/{id}`).
+- **Diff over time.** `GET /landscapes/{id}/diff` compares a run against the
+  previous run of the same query — **added / removed / changed** assets with
+  field-level deltas and new sources — surfaced as a DiffView (the **Δ** button
+  in History). Assets are matched by normalized name with a shared-source fallback.
 - **API keys.** `/query` and `/query/stream` accept an optional `X-API-Key` gate:
   set `ASSETSCOPE_API_KEYS=key1,key2` to require it (left empty = open, for
   localhost). `/health` stays open for orchestration.
 
 ## Roadmap (production-readiness)
 
-The core is built and validated; these are the next high-value steps for a
-team deployment (prioritized from a competitive-intelligence-analyst audit):
+Shipped: ✅ history/persistence · ✅ diff-over-time · ✅ openFDA tool · ✅ export ·
+✅ API-key auth. Next high-value steps (prioritized from a CI-analyst audit):
 
-1. **Persist landscapes** to Postgres with a saved library/history (jsonb), so
-   runs are durable, shareable, and re-openable. *(Prerequisite for 2–4.)*
-2. **Diff over time** — compare two runs of the same query (new assets, phase
-   advances, fresh readouts). Turns a snapshot tool into a monitoring tool.
-3. **Watchlist + scheduled re-run + change alerts** (email/Slack on non-empty diff).
-4. **More sources** — Europe PMC (full-text + citation graph), PatentsView (IP /
+1. **Watchlist + scheduled re-run + change alerts** (email/Slack on a non-empty diff).
+2. **More sources** — Europe PMC (full-text + citation graph), PatentsView (IP /
    patent-cliff landscape), RxNorm (drug-name normalization for cross-source dedup).
-5. **HTTP response cache + per-host rate limiting** (politeness + speed; the
+3. **HTTP response cache + per-host rate limiting** (politeness + speed; the
    429/Retry-After backoff is already in `tools/http.py`).
-6. **Cross-source asset dedup** (one canonical row per drug; the join key for diff)
+4. **Cross-source asset dedup** (one canonical row per drug; the join key for diff)
    and **per-claim confidence** (source count × tier × agreement).
 
 ## Limitations — honest caveats

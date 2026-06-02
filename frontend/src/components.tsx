@@ -1,4 +1,4 @@
-import type { Asset, Citation, Claim, GuardReport, Landscape } from "./types";
+import type { Asset, Citation, Claim, GuardReport, Landscape, LandscapeDiff } from "./types";
 import { exportCSV, exportMarkdown } from "./exporters";
 
 type CiteIndex = Record<string, Citation>;
@@ -164,6 +164,31 @@ export function LandscapeTable({ landscape, idx }: { landscape: Landscape; idx: 
             ))}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+export function DiffView({ diff }: { diff: LandscapeDiff }) {
+  const none = diff.n_added + diff.n_removed + diff.n_changed === 0;
+  return (
+    <div className="section">
+      <h2>Change vs previous run · +{diff.n_added} / −{diff.n_removed} / Δ{diff.n_changed}</h2>
+      <div className="card diffview">
+        {diff.added.map((a, i) => (
+          <div key={`a${i}`} className="diff-add">+ {a.asset_name} <span className="hm">{a.phase}</span></div>
+        ))}
+        {diff.removed.map((a, i) => (
+          <div key={`r${i}`} className="diff-rem">− {a.asset_name}</div>
+        ))}
+        {diff.changed.map((c, i) => (
+          <div key={`c${i}`} className="diff-chg">
+            Δ <strong>{c.asset_name}</strong>:{" "}
+            {Object.entries(c.changes).map(([f, v]) => `${f}: “${v.old || "∅"}” → “${v.new || "∅"}”`).join("; ")}
+            {c.new_source_ids.length > 0 && ` (+${c.new_source_ids.length} new source${c.new_source_ids.length > 1 ? "s" : ""})`}
+          </div>
+        ))}
+        {none && <div className="hm">No changes vs the previous run of this query.</div>}
       </div>
     </div>
   );

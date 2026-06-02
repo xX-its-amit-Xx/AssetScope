@@ -78,6 +78,19 @@ export interface LandscapeSummary {
   dropped_claims: number;
 }
 
+export interface LandscapeDiff {
+  query: string;
+  new_id: string;
+  old_id: string;
+  added: Asset[];
+  removed: Asset[];
+  changed: { asset_name: string; changes: Record<string, { old: string; new: string }>; new_source_ids: string[] }[];
+  n_added: number;
+  n_removed: number;
+  n_changed: number;
+  unchanged: number;
+}
+
 export interface GuardReport {
   total_claims: number;
   supported_claims: number;

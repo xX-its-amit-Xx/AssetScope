@@ -50,6 +50,7 @@ class LandscapeStoreP(Protocol):
     def save(self, landscape: Landscape, *, backend: str = "", model: str = "") -> str: ...
     def list(self, limit: int = 50) -> list[dict]: ...
     def get(self, id_: str) -> dict | None: ...
+    def find_prior(self, query: str, exclude_id: str) -> str | None: ...
     @property
     def backend(self) -> str: ...
 
@@ -105,6 +106,16 @@ class LandscapeStore:
             row = cur.fetchone()
             return row[0] if row else None
 
+    def find_prior(self, query: str, exclude_id: str) -> str | None:
+        with self._conn.cursor() as cur:
+            cur.execute(
+                "SELECT id FROM landscapes WHERE query = %s AND id <> %s "
+                "ORDER BY created_at DESC LIMIT 1",
+                (query, exclude_id),
+            )
+            row = cur.fetchone()
+            return row[0] if row else None
+
 
 class InMemoryLandscapeStore:
     """Fallback store (lost on restart) used when no database is reachable."""
@@ -132,6 +143,12 @@ class InMemoryLandscapeStore:
     def get(self, id_: str) -> dict | None:
         row = self._rows.get(id_)
         return row["landscape"] if row else None
+
+    def find_prior(self, query: str, exclude_id: str) -> str | None:
+        for i in self._order:  # newest first
+            if i != exclude_id and self._rows[i]["summary"]["query"] == query:
+                return i
+        return None
 
 
 _store: LandscapeStoreP | None = None
